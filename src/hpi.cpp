@@ -5,8 +5,9 @@
 #include <format>
 
 #include "hpi.hpp"
-#include "scanner/token.hpp"
 #include "scanner/scanner.hpp"
+#include "parser/parser.hpp"
+#include "tools/astPrint.hpp"
 
 // Global variables
 bool hadError = false;
@@ -37,13 +38,26 @@ void HPI::run(string src) {
     Scanner scanner(src);
     vector<Token> tokens = scanner.scanTokens();
 
-    for (const Token& token : tokens) {
-        cout << token.toString() << endl;
-    }
+    Parser parser(tokens);
+    Expr* expression = parser.parse();
+
+    if (hadError) return;
+
+    ASTPrinter printer;
+    printer.print(expression);
+    cout << endl;
 }
 
 void HPI::error(int line, string msg) {
     report(line, "", msg);
+}
+
+void HPI::error(Token token, string msg) {
+    if (token.type == TokenType::E_O_F) {
+        report(token.line, " at end", msg);
+    } else {
+        report(token.line, format(" at '{}'", token.lexeme), msg);
+    }
 }
 
 void HPI::report(int line, string where, string msg) {

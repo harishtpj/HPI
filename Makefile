@@ -3,7 +3,7 @@ CPPFLAGS = /nologo /EHsc /std:c++latest
 SRC_DIR = src
 BIN_DIR = bin
 
-SRCS = $(SRC_DIR)\*.cpp $(SRC_DIR)\scanner\*.cpp
+SRCS = $(SRC_DIR)\*.cpp $(SRC_DIR)\scanner\*.cpp $(SRC_DIR)\parser\*.cpp
 EXE = $(BIN_DIR)\hpi.exe
 
 all: $(EXE) clean
