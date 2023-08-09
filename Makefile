@@ -17,6 +17,15 @@ $(EXE): $(OBJS)
 	@$(CPP) $(CPPFLAGS) $(SRCS) /Fe$@
 	@echo "---> Built program"
 
+genast:
+	@echo "---> Generating AST Generator"
+	@$(CPP) $(CPPFLAGS) $(SRC_DIR)\tools\astGen.cpp
+	@echo "---> Built AST Generator"
+	@echo "---> Running AST Generator"
+	@astGen $(SRC_DIR)
+	@echo "---> Built AST"
+	@del /q astGen.*
+
 clean:
 	@IF EXIST "*.obj" del /s /q *.obj
 
