@@ -44,7 +44,7 @@ void HPI::run(string src) {
     if (hadError) return;
 
     ASTPrinter printer;
-    printer.print(expression);
+    cout << printer.print(expression);
     cout << endl;
 }
 

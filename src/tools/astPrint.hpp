@@ -8,32 +8,60 @@
 namespace HPI {
     class ASTPrinter : public ExprVisitor {
       public:
-        void print(Expr* expr) {
-            return expr->accept(this);
+        string print(Expr* expr) {
+            try {
+                return std::any_cast<std::string>(expr->accept(this));
+            } catch (const std::bad_any_cast &e) {
+                std::cout << "Ast::print -> " << e.what() << "\n";
+                return "something";
+            }
         }
-        void visitBinaryExpr(BinaryExpr* expr) override {
+        any visitBinaryExpr(BinaryExpr* expr) override {
             return parenthesize(expr->Operator.lexeme,
                                 {expr->left, expr->right});
         }
-        void visitGroupingExpr(GroupingExpr* expr) override {
+        any visitGroupingExpr(GroupingExpr* expr) override {
             return parenthesize("group", {expr->expression});
         }
-        void visitLiteralExpr(LiteralExpr* expr) override {
-            if (expr->value.empty())
-                std::cout << "nil";
-            std::cout << " " << expr->value;
+        any visitLiteralExpr(LiteralExpr* expr) override {
+            auto &type = expr->value.type();
+            if (type == typeid(nullptr)) {
+                std::string result{"nil"};
+                return result;
+            } else if (type == typeid(std::string)) {
+                try {
+                    return std::any_cast<std::string>(expr->value);
+                } catch (const std::bad_any_cast &e) {
+                    std::cout << "Ast::visitLiteralExpr -> " << e.what() << "\n";
+                    return "error";
+                }
+            } else if (type == typeid(double)) {
+                return std::to_string(std::any_cast<double>(expr->value));
+            } else if (type == typeid(bool)) {
+                if (std::any_cast<bool>(expr->value)) {
+                    std::string result{"true"};
+                    return result;
+                } else {
+                    std::string result{"false"};
+                    return result;
+                }
+            } else {
+                return "!!! no val match error";
+            }
         }
-        void visitUnaryExpr(UnaryExpr* expr) override {
+        any visitUnaryExpr(UnaryExpr* expr) override {
             return parenthesize(expr->Operator.lexeme, {expr->right});
         }
-        void parenthesize(std::string name, std::vector<Expr*> exprs) {
+        string parenthesize(std::string name, std::vector<Expr*> exprs) {
+            std::ostringstream buffer;
             std::string pp = "(" + name;
             // print
-            std::cout << pp;
+            buffer << pp;
             for (auto expr : exprs) {
-                expr->accept(this);
+                buffer << " " << print(expr);
             }
-            std::cout << ")";
+            buffer << ")";
+            return buffer.str();
         }
     };
 } // namespace HPI

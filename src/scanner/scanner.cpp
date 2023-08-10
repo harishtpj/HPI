@@ -44,6 +44,8 @@ void Scanner::scanToken() {
         case '+': addToken(TokenType::PLUS); break;
         case '*': addToken(TokenType::STAR); break;
         case '/': addToken(TokenType::SLASH); break;
+        case '[': addToken(TokenType::LEFT_BRACKET); break;
+        case ']': addToken(TokenType::RIGHT_BRACKET); break;
         case '!': 
             addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG); 
             break;

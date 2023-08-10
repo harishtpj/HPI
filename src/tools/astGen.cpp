@@ -60,7 +60,7 @@ class ASTGenerator {
         file << "class " << baseName << " {" << std::endl;
         file << "public:" << std::endl;
         file << "virtual ~" << baseName << "() {}" << std::endl;
-        file << "virtual void accept(" << baseName + "Visitor* visitor) = 0;"
+        file << "virtual std::any accept(" << baseName + "Visitor* visitor) = 0;"
              << std::endl;
         file << "};" << std::endl;
 
@@ -105,9 +105,9 @@ class ASTGenerator {
             file << fieldName + "(" + fieldName + ")";
         }
         file << " {}" << std::endl;
-        file << "void accept(" << baseName + "Visitor* visitor) override {"
+        file << "std::any accept(" << baseName + "Visitor* visitor) override {"
              << std::endl;
-        file << "visitor->visit" << className << "(this);" << std::endl;
+        file << "return visitor->visit" << className << "(this);" << std::endl;
         file << "}" << std::endl;
         file << "public: " << std::endl;
         for (auto field : fieldList) {
@@ -128,7 +128,7 @@ class ASTGenerator {
         file << "virtual ~" << visitorClassName << "() {}" << std::endl;
         for (auto type : astSpec.second) {
             auto className = type.substr(0, type.find(":"));
-            file << "virtual void "
+            file << "virtual std::any "
                  << "visit" + className << "(" << className << "* " << baseName
                  << ") = 0;" << std::endl;
         }
@@ -148,10 +148,10 @@ int main(int argc, char** argv) {
         const std::string outDir                     = argv[1];
         const ASTGenerator::ASTSpecification astSpec = {
             "Expr",
-            {"BinaryExpr   :Expr left,Token Operator,Expr right",
-             "GroupingExpr :Expr expression", 
-             "LiteralExpr  :std::string value",
-             "UnaryExpr    :Token Operator,Expr right"}};
+            {"BinaryExpr   : Expr left, Token Operator, Expr right",
+             "GroupingExpr : Expr expression", 
+             "LiteralExpr  : std::any value",
+             "UnaryExpr    : Token Operator, Expr right"}};
         ASTGenerator astGenerator(outDir, astSpec);
         astGenerator.generate();
     }

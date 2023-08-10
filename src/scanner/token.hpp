@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <any>
 #include <format>
 
 using namespace std;
@@ -8,7 +9,7 @@ using namespace std;
 enum class TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, COMMA, DOT, MINUS, PLUS,
-    SLASH, STAR,
+    SLASH, STAR, LEFT_BRACKET, RIGHT_BRACKET,
   
     // One or two character tokens.
     BANG, BANG_EQUAL,
@@ -29,10 +30,10 @@ enum class TokenType {
 class Token {
     public:
         const TokenType type;
-        const string lexeme;
-        const string literal;
         const int line;
+        const string lexeme;
+        const any literal;
 
-        Token(TokenType type, string lexeme, string literal, int line);
+        Token(TokenType type, string lexeme, any literal, int line);
         string toString() const;
 };
