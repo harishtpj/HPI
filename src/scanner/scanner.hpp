@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <vector>
 #include <unordered_map>
 
@@ -26,7 +25,7 @@ class Scanner {
         bool isAtEnd();
         char advance();
         void addToken(TokenType type);
-        void addToken(TokenType type,string literal);
+        void addToken(TokenType type,any literal);
         bool match(char expected);
         char peek();
         char peekNext();

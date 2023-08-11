@@ -8,7 +8,8 @@ EXE = $(BIN_DIR)\hpi.exe
 
 all: $(EXE) clean
 
-run: $(EXE) clean
+run: refresh $(EXE)
+	@$(MAKE) clean
 	@echo "---> Running..."
 	@$(EXE)
 

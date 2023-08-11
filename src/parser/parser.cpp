@@ -68,9 +68,9 @@ Expr* Parser::unary() {
 }
 
 Expr* Parser::primary() {
-    if (match({TokenType::FALSE})) return new LiteralExpr("false");
-    if (match({TokenType::TRUE})) return new LiteralExpr("true");
-    if (match({TokenType::NIL})) return new LiteralExpr("nil");
+    if (match({TokenType::FALSE})) return new LiteralExpr(false);
+    if (match({TokenType::TRUE})) return new LiteralExpr(true);
+    if (match({TokenType::NIL})) return new LiteralExpr(nullptr);
 
     if (match({TokenType::NUMBER, TokenType::STRING})) 
         return new LiteralExpr(previous().literal);

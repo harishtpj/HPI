@@ -1,6 +1,7 @@
 #include <format>
 #include "scanner.hpp"
 #include "../hpi.hpp"
+#include <iostream>
 
 Scanner::Scanner(string src): src(src) {
     keywords["and"] = TokenType::AND;
@@ -116,7 +117,7 @@ void Scanner::scanString() {
 
     advance();
 
-    string value = src.substr(start + 1, current - 1 - start);
+    string value = src.substr(start + 1, current - 2 - start);
     addToken(TokenType::STRING, value);
 }
 
@@ -164,7 +165,7 @@ void Scanner::addToken(TokenType type) {
     addToken(type, "");
 }
 
-void Scanner::addToken(TokenType type, string literal) {
+void Scanner::addToken(TokenType type, any literal) {
     string text = src.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line));
 }

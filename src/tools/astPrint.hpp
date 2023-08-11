@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace HPI {
     class ASTPrinter : public ExprVisitor {
