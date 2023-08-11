@@ -101,7 +101,7 @@ void Scanner::scanNumber() {
         while (isDigit(peek())) advance();
     }
 
-    addToken(TokenType::NUMBER, src.substr(start, current - start));
+    addToken(TokenType::NUMBER, stod(src.substr(start, current - start)));
 }
 
 void Scanner::scanString() {

@@ -7,10 +7,12 @@
 #include "hpi.hpp"
 #include "scanner/scanner.hpp"
 #include "parser/parser.hpp"
-#include "tools/astPrint.hpp"
+#include "interpreter/interpreter.hpp"
 
 // Global variables
 bool hadError = false;
+bool hadRuntimeError = false;
+Interpreter interpreter;
 
 // Namespace definitions
 void HPI::runFile(string path) {
@@ -20,6 +22,7 @@ void HPI::runFile(string path) {
     run(byte_stream.str());
 
     if (hadError) exit(65);
+    if (hadRuntimeError) exit(70);
 }
 
 void HPI::runPrompt() {
@@ -43,9 +46,7 @@ void HPI::run(string src) {
 
     if (hadError) return;
 
-    ASTPrinter printer;
-    cout << printer.print(expression);
-    cout << endl;
+    interpreter.interpret(expression);
 }
 
 void HPI::error(int line, string msg) {
@@ -58,6 +59,11 @@ void HPI::error(Token token, string msg) {
     } else {
         report(token.line, format(" at '{}'", token.lexeme), msg);
     }
+}
+
+void HPI::runtimeError(RuntimeError e) {
+    cerr << format("[Line {}] Error: {}", e.token.line, e.what()) << endl;
+    hadRuntimeError = true;
 }
 
 void HPI::report(int line, string where, string msg) {
