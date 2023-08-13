@@ -1,73 +1,60 @@
 #pragma once
 #include "scanner/token.hpp"
-class Expr;         // forward declare
-class BinaryExpr;   // forward declare
-class GroupingExpr; // forward declare
-class LiteralExpr;  // forward declare
-class UnaryExpr;    // forward declare
-class ExprVisitor
-{
+
+class Expr; // forward declare
+class BinaryExpr   ; // forward declare
+class GroupingExpr ; // forward declare
+class LiteralExpr  ; // forward declare
+class UnaryExpr    ; // forward declare
+class ExprVisitor {
 public:
     virtual ~ExprVisitor() {}
-    virtual std::any visitBinaryExpr(BinaryExpr *Expr) = 0;
-    virtual std::any visitGroupingExpr(GroupingExpr *Expr) = 0;
-    virtual std::any visitLiteralExpr(LiteralExpr *Expr) = 0;
-    virtual std::any visitUnaryExpr(UnaryExpr *Expr) = 0;
+    virtual std::any visitBinaryExpr   (BinaryExpr   * Expr) = 0;
+    virtual std::any visitGroupingExpr (GroupingExpr * Expr) = 0;
+    virtual std::any visitLiteralExpr  (LiteralExpr  * Expr) = 0;
+    virtual std::any visitUnaryExpr    (UnaryExpr    * Expr) = 0;
 };
-class Expr
-{
+class Expr {
 public:
     virtual ~Expr() {}
-    virtual std::any accept(ExprVisitor *visitor) = 0;
+    virtual std::any accept(ExprVisitor* visitor) = 0;
 };
-class BinaryExpr : public Expr
-{
+class BinaryExpr    : public Expr {
 public:
-    BinaryExpr(Expr *left, Token Operator, Expr *right) : left(left), Operator(Operator), right(right) {}
-    std::any accept(ExprVisitor *visitor) override
-    {
-        return visitor->visitBinaryExpr(this);
+    BinaryExpr   (Expr* left, Token Operator, Expr* right)  : left(left), Operator(Operator), right(right) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitBinaryExpr   (this);
     }
-
 public:
-    Expr *left;
+    Expr* left;
     Token Operator;
-    Expr *right;
+    Expr* right;
 };
-class GroupingExpr : public Expr
-{
+class GroupingExpr  : public Expr {
 public:
-    GroupingExpr(Expr *expression) : expression(expression) {}
-    std::any accept(ExprVisitor *visitor) override
-    {
-        return visitor->visitGroupingExpr(this);
+    GroupingExpr (Expr* expression)  : expression(expression) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitGroupingExpr (this);
     }
-
 public:
-    Expr *expression;
+    Expr* expression;
 };
-class LiteralExpr : public Expr
-{
+class LiteralExpr   : public Expr {
 public:
-    LiteralExpr(std::any value) : value(value) {}
-    std::any accept(ExprVisitor *visitor) override
-    {
-        return visitor->visitLiteralExpr(this);
+    LiteralExpr  (std::any value)  : value(value) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitLiteralExpr  (this);
     }
-
 public:
     std::any value;
 };
-class UnaryExpr : public Expr
-{
+class UnaryExpr     : public Expr {
 public:
-    UnaryExpr(Token Operator, Expr *right) : Operator(Operator), right(right) {}
-    std::any accept(ExprVisitor *visitor) override
-    {
-        return visitor->visitUnaryExpr(this);
+    UnaryExpr    (Token Operator, Expr* right)  : Operator(Operator), right(right) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitUnaryExpr    (this);
     }
-
 public:
     Token Operator;
-    Expr *right;
+    Expr* right;
 };

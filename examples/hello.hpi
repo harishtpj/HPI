@@ -1,0 +1,3 @@
+# Simple program to print "Hello" to screen
+
+println "Hello, World!"

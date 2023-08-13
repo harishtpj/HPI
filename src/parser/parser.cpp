@@ -1,8 +1,35 @@
 #include "parser.hpp"
+#include <iostream>
 
 ParseError::ParseError(string msg, Token token): runtime_error(msg), token(token) {}
 
 Parser::Parser(const vector<Token>& tokens): tokens(tokens) {}
+
+Stmt* Parser::statement() {
+    while (check(TokenType::NEWLINE)) advance();
+    if (match({TokenType::PRINT})) return printStatement();
+
+    return expressionStatement();
+}
+
+Stmt* Parser::printStatement() {
+    Expr* value = expression();
+    if (!isRepl) consumeNewline();
+    return new PrintStmt(value);
+}
+
+Stmt* Parser::expressionStatement() {
+    Expr* expr = expression();
+
+    if (isRepl && isAtEnd()) {
+        foundExpression = true;
+        lastExpr = expr;
+    } else {
+        consumeNewline();
+    }
+
+    return new ExpressionStmt(expr);
+}
 
 Expr* Parser::expression() {
     return equality();
@@ -84,12 +111,28 @@ Expr* Parser::primary() {
     throw error(peek(), "Expect expression.");
 }
 
-Expr* Parser::parse() {
-    try {
-        return expression();
-    } catch (ParseError error) {
-        return nullptr;
+vector<Stmt*> Parser::parse() {
+    vector<Stmt*> statements;
+    while (!isAtEnd()) {
+        statements.push_back(statement());
     }
+    return statements;
+}
+
+any Parser::parseRepl() {
+    isRepl = true;
+    vector<Stmt*> statements;
+
+    while (!isAtEnd()) {
+        statements.push_back(statement());
+        if (foundExpression) {
+            return lastExpr;
+        }
+
+        isRepl = false;
+    }
+    
+    return statements;
 }
 
 bool Parser::match(const vector<TokenType>& types) {
@@ -127,6 +170,12 @@ Token Parser::previous() {
 Token Parser::consume(TokenType type, string message) {
     if (check(type)) return advance();
     throw error(peek(), message);
+}
+
+void Parser::consumeNewline() {
+    if (isAtEnd()) return;
+    consume(TokenType::NEWLINE, "Expect newline.");
+    while (check(TokenType::NEWLINE)) advance();
 }
 
 ParseError Parser::error(Token token, string message) {

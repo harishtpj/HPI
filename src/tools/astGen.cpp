@@ -29,7 +29,6 @@ class ASTGenerator {
         : outDir(aDir)
         , astSpec(aSpec) {}
     void generate() {
-        std::cout << outDir << std::endl;
         defineAST();
     }
     void defineAST() {
@@ -46,6 +45,7 @@ class ASTGenerator {
 
         // Expr base abstract interface
         file << "#include \"scanner/token.hpp\"" << std::endl;
+        file << ((baseName == "Stmt") ? "#include \"Expr.hpp\"" : " ") << std::endl;
 
         // forward declarations
         file << "class " << baseName << "; // forward declare" << std::endl;
@@ -146,14 +146,19 @@ int main(int argc, char** argv) {
         exit(64);
     } else {
         const std::string outDir                     = argv[1];
-        const ASTGenerator::ASTSpecification astSpec = {
-            "Expr",
-            {"BinaryExpr   : Expr left, Token Operator, Expr right",
+        const ASTGenerator::ASTSpecification astSpec = {"Expr", {
+             "BinaryExpr   : Expr left, Token Operator, Expr right",
              "GroupingExpr : Expr expression", 
              "LiteralExpr  : std::any value",
              "UnaryExpr    : Token Operator, Expr right"}};
-        ASTGenerator astGenerator(outDir, astSpec);
-        astGenerator.generate();
+        ASTGenerator exprAstGenerator(outDir, astSpec);
+        exprAstGenerator.generate();
+
+        const ASTGenerator::ASTSpecification astSpec2 = { "Stmt", {
+            "ExpressionStmt : Expr* expression",
+            "PrintStmt      : Expr* expression"}};
+        ASTGenerator stmtAstGenerator(outDir, astSpec2);
+        stmtAstGenerator.generate();
     }
     return 0;
 }

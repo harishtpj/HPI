@@ -7,7 +7,7 @@ SRCS = $(SRC_DIR)\*.cpp $(SRC_DIR)\scanner\*.cpp $(SRC_DIR)\parser\*.cpp  \
 		$(SRC_DIR)\interpreter\*.cpp
 EXE = $(BIN_DIR)\hpi.exe
 
-all: $(EXE) clean
+all: refresh $(EXE)
 
 run: refresh $(EXE)
 	@$(MAKE) clean
@@ -17,6 +17,7 @@ run: refresh $(EXE)
 $(EXE): $(OBJS)
 	@echo "---> Compiling..."
 	@$(CPP) $(CPPFLAGS) $(SRCS) /Fe$@
+	@$(MAKE) clean
 	@echo "---> Built program"
 
 genast:
@@ -25,6 +26,8 @@ genast:
 	@echo "---> Built AST Generator"
 	@echo "---> Running AST Generator"
 	@astGen $(SRC_DIR)
+	@astyle $(SRC_DIR)\Expr.hpp $(SRC_DIR)\Stmt.hpp
+	@del /q $(SRC_DIR)\*.orig
 	@echo "---> Built AST"
 	@del /q astGen.*
 

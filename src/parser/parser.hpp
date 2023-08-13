@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../Expr.hpp"
+#include "../Stmt.hpp"
 #include "../hpi.hpp"
 
 using namespace std;
@@ -16,11 +17,20 @@ class ParseError : public runtime_error {
 class Parser {
     public:
         Parser(const vector<Token>& tokens);
-        Expr* parse();
+        vector<Stmt*> parse();
+        any parseRepl();
     
     private:
         const vector<Token> tokens;
+        bool isRepl = false;
+        bool foundExpression = false;
         int current = 0;
+
+        Expr* lastExpr;
+
+        Stmt* statement();
+        Stmt* printStatement();
+        Stmt* expressionStatement();
 
         Expr* expression();
         Expr* equality();
@@ -37,6 +47,7 @@ class Parser {
         Token peek();
         Token previous();
         Token consume(TokenType type, string message);
+        void consumeNewline();
         ParseError error(Token token, string message);
         void synchronize();
 };

@@ -32,7 +32,24 @@ void HPI::runPrompt() {
         cout << ".>> ";
         getline(cin, line);
         if (line.empty()) break;
-        run(line);
+
+        Scanner scanner(line);
+        vector<Token> tokens = scanner.scanTokens();
+
+        Parser parser(tokens);
+        any syntax = parser.parseRepl();
+
+        if (hadError) continue;
+
+        if (syntax.type() == typeid(vector<Stmt*>)) {
+            interpreter.interpret(any_cast<vector<Stmt*>>(syntax));
+        } else if (syntax.type() == typeid(Expr*)) {
+            string result = interpreter.interpret(any_cast<Expr*>(syntax));
+            if (result != "expr null") {
+                cout << ":= " << result << endl;
+            }
+        }
+
         hadError = false;
     }
 }
@@ -42,11 +59,11 @@ void HPI::run(string src) {
     vector<Token> tokens = scanner.scanTokens();
 
     Parser parser(tokens);
-    Expr* expression = parser.parse();
+    vector<Stmt*> statements = parser.parse();
 
     if (hadError) return;
 
-    interpreter.interpret(expression);
+    interpreter.interpret(statements);
 }
 
 void HPI::error(int line, string msg) {
@@ -76,7 +93,7 @@ int main(int argc, char* argv[]) {
         cerr << "Usage: hpi [file]" << endl;
         exit(64);
     } else if (argc == 2) {
-        HPI::runFile(argv[0]);
+        HPI::runFile(argv[1]);
     } else {
         HPI::runPrompt();
     }

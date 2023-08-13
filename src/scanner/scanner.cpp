@@ -2,6 +2,7 @@
 #include "scanner.hpp"
 #include "../hpi.hpp"
 #include <iostream>
+#include <algorithm>
 
 Scanner::Scanner(string src): src(src) {
     keywords["and"] = TokenType::AND;
@@ -22,6 +23,14 @@ Scanner::Scanner(string src): src(src) {
     keywords["end"] = TokenType::END;
     keywords["to"] = TokenType::TO;
     keywords["then"] = TokenType::THEN;
+
+    // Support uppercase statements
+    for (auto &[key, value] : keywords) {
+        string upperKeyword = key;
+        transform(upperKeyword.begin(), upperKeyword.end(), upperKeyword.begin(), ::toupper);
+        keywords[upperKeyword] = value;
+    }
+    
 }
 
 vector<Token> Scanner::scanTokens() {
@@ -67,6 +76,7 @@ void Scanner::scanToken() {
         case '\t':
             break;
         case '\n':
+            addToken(TokenType::NEWLINE);
             line++;
             break;
         case '"': scanString(); break;

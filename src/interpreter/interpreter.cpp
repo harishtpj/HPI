@@ -2,13 +2,23 @@
 #include "../hpi.hpp"
 #include <iostream>
 
-void Interpreter::interpret(Expr* expression) {
+void Interpreter::interpret(vector<Stmt*> stmts) {
     try {
-        any value = evaluate(expression);
-        cout << stringify(value) << endl;
-    }
-    catch(const RuntimeError& e) {
+        for (Stmt* &stmt: stmts) {
+            execute(stmt);
+        }
+    } catch(const RuntimeError& e) {
         HPI::runtimeError(e);
+    }
+}
+
+string Interpreter::interpret(Expr* expr) {
+    try {
+        any value = evaluate(expr);
+        return stringify(value);
+    } catch(const RuntimeError& e) {
+        HPI::runtimeError(e);
+        return "expr null";
     }
 }
 
@@ -89,8 +99,24 @@ any Interpreter::visitBinaryExpr(BinaryExpr* expr) {
     return nullptr;
 }
 
+any Interpreter::visitExpressionStmt(ExpressionStmt* stmt) {
+    evaluate(stmt->expression);
+    return nullptr;
+}
+
+any Interpreter::visitPrintStmt(PrintStmt* stmt) {
+    any value = evaluate(stmt->expression);
+    cout << stringify(value);
+    return nullptr;
+}
+
 any Interpreter::evaluate(Expr* expr) {
     return expr->accept(this);
+}
+
+any Interpreter::execute(Stmt* stmt) {
+    stmt->accept(this);
+    return nullptr;
 }
 
 bool Interpreter::isTruthy(any object) {
