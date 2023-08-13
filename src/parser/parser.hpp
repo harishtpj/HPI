@@ -26,13 +26,17 @@ class Parser {
         bool foundExpression = false;
         int current = 0;
 
-        Expr* lastExpr;
-
+        Stmt* declaration();
         Stmt* statement();
         Stmt* printStatement();
+        Stmt* printLnStatement();
         Stmt* expressionStatement();
+        vector<Stmt*> block();
+
+        Stmt* varDeclaration();
 
         Expr* expression();
+        Expr* assignment();
         Expr* equality();
         Expr* comparison();
         Expr* term();

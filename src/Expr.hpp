@@ -2,22 +2,36 @@
 #include "scanner/token.hpp"
 
 class Expr; // forward declare
+class AssignExpr   ; // forward declare
 class BinaryExpr   ; // forward declare
 class GroupingExpr ; // forward declare
 class LiteralExpr  ; // forward declare
 class UnaryExpr    ; // forward declare
+class VariableExpr ; // forward declare
 class ExprVisitor {
 public:
     virtual ~ExprVisitor() {}
+    virtual std::any visitAssignExpr   (AssignExpr   * Expr) = 0;
     virtual std::any visitBinaryExpr   (BinaryExpr   * Expr) = 0;
     virtual std::any visitGroupingExpr (GroupingExpr * Expr) = 0;
     virtual std::any visitLiteralExpr  (LiteralExpr  * Expr) = 0;
     virtual std::any visitUnaryExpr    (UnaryExpr    * Expr) = 0;
+    virtual std::any visitVariableExpr (VariableExpr * Expr) = 0;
 };
 class Expr {
 public:
     virtual ~Expr() {}
     virtual std::any accept(ExprVisitor* visitor) = 0;
+};
+class AssignExpr    : public Expr {
+public:
+    AssignExpr   (Token name, Expr* value)  : name(name), value(value) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitAssignExpr   (this);
+    }
+public:
+    Token name;
+    Expr* value;
 };
 class BinaryExpr    : public Expr {
 public:
@@ -57,4 +71,13 @@ public:
 public:
     Token Operator;
     Expr* right;
+};
+class VariableExpr  : public Expr {
+public:
+    VariableExpr (Token name)  : name(name) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitVariableExpr (this);
+    }
+public:
+    Token name;
 };

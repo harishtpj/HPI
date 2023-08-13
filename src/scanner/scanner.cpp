@@ -23,6 +23,8 @@ Scanner::Scanner(string src): src(src) {
     keywords["end"] = TokenType::END;
     keywords["to"] = TokenType::TO;
     keywords["then"] = TokenType::THEN;
+    keywords["let"] = TokenType::LET;
+    keywords["break"] = TokenType::BREAK;
 
     // Support uppercase statements
     for (auto &[key, value] : keywords) {

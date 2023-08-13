@@ -22,6 +22,12 @@ string Interpreter::interpret(Expr* expr) {
     }
 }
 
+any Interpreter::visitAssignExpr(AssignExpr* expr) {
+    any value = evaluate(expr->value);
+    environment.assign(expr->name, value);
+    return value;
+}
+
 any Interpreter::visitLiteralExpr(LiteralExpr* expr) {
     return expr->value;
 }
@@ -110,6 +116,26 @@ any Interpreter::visitPrintStmt(PrintStmt* stmt) {
     return nullptr;
 }
 
+any Interpreter::visitBlockStmt(BlockStmt* stmt) {
+    executeBlock(stmt->statements, new Environment(environment));
+    return nullptr;
+}
+
+any Interpreter::visitVarStmt(VarStmt* stmt) {
+    any value = nullptr;
+
+    if (stmt->initializer != nullptr) {
+        value = evaluate(stmt->initializer);
+    }
+        
+    environment.define(stmt->name.lexeme, value);
+    return nullptr;
+}
+
+any Interpreter::visitVariableExpr(VariableExpr* expr) {
+    return environment.get(expr->name);
+}
+
 any Interpreter::evaluate(Expr* expr) {
     return expr->accept(this);
 }
@@ -117,6 +143,21 @@ any Interpreter::evaluate(Expr* expr) {
 any Interpreter::execute(Stmt* stmt) {
     stmt->accept(this);
     return nullptr;
+}
+
+void Interpreter::executeBlock(vector<Stmt*> stmts, Environment env) {
+    Environment previous = env;
+    try {
+        this->environment = env;
+
+        for (Stmt* &stmt: stmts) {
+            execute(stmt);
+        }
+    } catch (...) {
+        this->environment = previous;
+        throw;
+    }
+    this->environment = previous;
 }
 
 bool Interpreter::isTruthy(any object) {

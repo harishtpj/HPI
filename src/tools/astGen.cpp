@@ -46,6 +46,7 @@ class ASTGenerator {
         // Expr base abstract interface
         file << "#include \"scanner/token.hpp\"" << std::endl;
         file << ((baseName == "Stmt") ? "#include \"Expr.hpp\"" : " ") << std::endl;
+        file << ((baseName == "Stmt") ? "#include <vector>" : " ") << std::endl;
 
         // forward declarations
         file << "class " << baseName << "; // forward declare" << std::endl;
@@ -147,16 +148,20 @@ int main(int argc, char** argv) {
     } else {
         const std::string outDir                     = argv[1];
         const ASTGenerator::ASTSpecification astSpec = {"Expr", {
+             "AssignExpr   : Token name, Expr value",
              "BinaryExpr   : Expr left, Token Operator, Expr right",
              "GroupingExpr : Expr expression", 
              "LiteralExpr  : std::any value",
-             "UnaryExpr    : Token Operator, Expr right"}};
+             "UnaryExpr    : Token Operator, Expr right",
+             "VariableExpr : Token name",}};
         ASTGenerator exprAstGenerator(outDir, astSpec);
         exprAstGenerator.generate();
 
         const ASTGenerator::ASTSpecification astSpec2 = { "Stmt", {
+            "BlockStmt      : std::vector<Stmt*> statements",
             "ExpressionStmt : Expr* expression",
-            "PrintStmt      : Expr* expression"}};
+            "PrintStmt      : Expr* expression",
+            "VarStmt        : Token name, Expr* initializer",}};
         ASTGenerator stmtAstGenerator(outDir, astSpec2);
         stmtAstGenerator.generate();
     }

@@ -4,6 +4,7 @@
 #include "../Stmt.hpp"
 #include "runtime_err.hpp"
 #include <vector>
+#include "environment.hpp"
 
 class Interpreter : public ExprVisitor, StmtVisitor {
     public:
@@ -16,8 +17,16 @@ class Interpreter : public ExprVisitor, StmtVisitor {
 
         any visitExpressionStmt(ExpressionStmt* stmt);
         any visitPrintStmt(PrintStmt* stmt);
+        any visitBlockStmt(BlockStmt* stmt);
+
+        any visitVarStmt(VarStmt* stmt);
+        any visitVariableExpr(VariableExpr* expr);
+
+        any visitAssignExpr(AssignExpr* expr);
     
     private:
+        Environment environment;
+
         any evaluate(Expr* expr);
         any execute(Stmt* stmt);
         bool isTruthy(any value);
@@ -25,4 +34,5 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         void checkNumberOperand(Token op, any operand);
         void checkNumberOperands(Token op, any left, any right);
         string stringify(any value);
+        void executeBlock(vector<Stmt*> stmts, Environment env);
 };

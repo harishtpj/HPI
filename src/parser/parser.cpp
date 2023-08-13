@@ -5,9 +5,32 @@ ParseError::ParseError(string msg, Token token): runtime_error(msg), token(token
 
 Parser::Parser(const vector<Token>& tokens): tokens(tokens) {}
 
+Stmt* Parser::declaration() {
+    try {
+        if (match({TokenType::LET})) return varDeclaration();
+        
+        return statement();
+    } catch (const ParseError& e) {
+        synchronize();
+        return nullptr;
+    }
+}
+
+Stmt* Parser::varDeclaration() {
+    Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+
+    Expr* initializer = nullptr;
+    if (match({TokenType::EQUAL})) initializer = expression();
+
+    if (!isRepl) consumeNewline();
+    return new VarStmt(name, initializer);
+}
+
 Stmt* Parser::statement() {
     while (check(TokenType::NEWLINE)) advance();
     if (match({TokenType::PRINT})) return printStatement();
+    if (match({TokenType::PRINTLN})) return printLnStatement();
+    if (match({TokenType::DO})) return new BlockStmt(block());
 
     return expressionStatement();
 }
@@ -18,12 +41,22 @@ Stmt* Parser::printStatement() {
     return new PrintStmt(value);
 }
 
+Stmt* Parser::printLnStatement() {
+    Expr* value = expression();
+    if (!isRepl) consumeNewline();
+
+    Stmt* print = new PrintStmt(value);
+    string nl{"\n"};
+    Stmt* newLine = new PrintStmt(new LiteralExpr(nl));
+
+    return new BlockStmt({print, newLine});
+}
+
 Stmt* Parser::expressionStatement() {
     Expr* expr = expression();
 
     if (isRepl && isAtEnd()) {
         foundExpression = true;
-        lastExpr = expr;
     } else {
         consumeNewline();
     }
@@ -31,8 +64,38 @@ Stmt* Parser::expressionStatement() {
     return new ExpressionStmt(expr);
 }
 
+vector<Stmt*> Parser::block() {
+    vector<Stmt*> statements;
+    while (check(TokenType::NEWLINE)) advance();
+
+    while (!check(TokenType::END) && !isAtEnd()) {
+        statements.push_back(declaration());
+    }
+
+    consume(TokenType::END, "Expect 'end' after block.");
+    return statements;
+}
+
 Expr* Parser::expression() {
-    return equality();
+    return assignment();
+}
+
+Expr* Parser::assignment() {
+    Expr* expr = equality();
+
+    if (match({TokenType::EQUAL})) {
+        Token equals = previous();
+        Expr* value = assignment();
+
+        if (VariableExpr* e = dynamic_cast<VariableExpr*>(expr)) {
+            Token name = e->name;
+            return new AssignExpr(name, value);
+        }
+
+        error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
 }
 
 Expr* Parser::equality() {
@@ -101,6 +164,9 @@ Expr* Parser::primary() {
 
     if (match({TokenType::NUMBER, TokenType::STRING})) 
         return new LiteralExpr(previous().literal);
+    
+    if (match({TokenType::IDENTIFIER})) 
+        return new VariableExpr(previous());
 
     if (match({TokenType::LEFT_PAREN})) {
         Expr* expr = expression();
@@ -114,7 +180,7 @@ Expr* Parser::primary() {
 vector<Stmt*> Parser::parse() {
     vector<Stmt*> statements;
     while (!isAtEnd()) {
-        statements.push_back(statement());
+        statements.push_back(declaration());
     }
     return statements;
 }
@@ -124,9 +190,10 @@ any Parser::parseRepl() {
     vector<Stmt*> statements;
 
     while (!isAtEnd()) {
-        statements.push_back(statement());
+        statements.push_back(declaration());
         if (foundExpression) {
-            return lastExpr;
+            Stmt* last = statements.back();
+            return dynamic_cast<ExpressionStmt*>(last)->expression;
         }
 
         isRepl = false;
