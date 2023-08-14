@@ -6,6 +6,7 @@ ParseError::ParseError(string msg, Token token): runtime_error(msg), token(token
 Parser::Parser(const vector<Token>& tokens): tokens(tokens) {}
 
 Stmt* Parser::declaration() {
+    while (check(TokenType::NEWLINE)) advance();
     try {
         if (match({TokenType::LET})) return varDeclaration();
         
@@ -28,11 +29,47 @@ Stmt* Parser::varDeclaration() {
 
 Stmt* Parser::statement() {
     while (check(TokenType::NEWLINE)) advance();
+    if (match({TokenType::BREAK})) return breakStmt();
+    if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::PRINTLN})) return printLnStatement();
+    if (match({TokenType::REPEAT})) return repeatStatement();
     if (match({TokenType::DO})) return new BlockStmt(block());
 
     return expressionStatement();
+}
+
+Stmt* Parser::ifBlockStatements() {
+    while (check(TokenType::NEWLINE)) advance();
+    if (match({TokenType::BREAK})) return breakStmt();
+    if (match({TokenType::IF})) return ifStatement();
+    if (match({TokenType::PRINT})) return printStatement();
+    if (match({TokenType::PRINTLN})) return printLnStatement();
+    if (match({TokenType::REPEAT})) return repeatStatement();
+    if (match({TokenType::DO})) return new BlockStmt(ifBlock());
+
+    return expressionStatement();
+}
+
+Stmt* Parser::ifStatement() {
+    Expr* condition = expression();
+    consume(TokenType::THEN, "Expect 'then' keyword after if condition.");
+
+    Stmt* thenBranch = ifBlockStatements();
+
+    Stmt* elseBranch = nullptr;
+    if (match({TokenType::ELSE})) 
+        elseBranch = statement();
+
+    return new IfStmt(condition, thenBranch, elseBranch);
+}
+
+Stmt* Parser::breakStmt() {
+    if (loopDepth == 0) {
+        error(previous(), "Cannot break outside of loop.");
+    }
+    consume(TokenType::NEWLINE, "Expect 'newline' after 'break'.");
+    return new BreakStmt();
 }
 
 Stmt* Parser::printStatement() {
@@ -50,6 +87,18 @@ Stmt* Parser::printLnStatement() {
     Stmt* newLine = new PrintStmt(new LiteralExpr(nl));
 
     return new BlockStmt({print, newLine});
+}
+
+Stmt* Parser::repeatStatement() {
+    try {
+        loopDepth++;
+        Stmt* body = statement();
+        return new RepeatStmt(body);
+    } catch(...) {
+        loopDepth--;
+        throw;
+    }
+    loopDepth--;
 }
 
 Stmt* Parser::expressionStatement() {
@@ -76,12 +125,28 @@ vector<Stmt*> Parser::block() {
     return statements;
 }
 
+vector<Stmt*> Parser::ifBlock() {
+    vector<Stmt*> statements;
+    while (check(TokenType::NEWLINE)) advance();
+
+    while (!(check(TokenType::ELSE) || check(TokenType::END)) && !isAtEnd()) {
+        statements.push_back(declaration());
+    }
+
+    if (check(TokenType::ELSE)) {
+        return statements;
+    }
+    
+    consume(TokenType::END, "Expect 'end' after block.");
+    return statements;
+}
+
 Expr* Parser::expression() {
     return assignment();
 }
 
 Expr* Parser::assignment() {
-    Expr* expr = equality();
+    Expr* expr = orExpr();
 
     if (match({TokenType::EQUAL})) {
         Token equals = previous();
@@ -93,6 +158,30 @@ Expr* Parser::assignment() {
         }
 
         error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
+}
+
+Expr* Parser::orExpr() {
+    Expr* expr = andExpr();
+
+    while (match({TokenType::OR})) {
+        Token op = previous();
+        Expr* right = andExpr();
+        expr = new LogicalExpr(expr, op, right);
+    }
+
+    return expr;
+}
+
+Expr* Parser::andExpr() {
+    Expr* expr = equality();
+
+    while (match({TokenType::AND})) {
+        Token op = previous();
+        Expr* right = equality();
+        expr = new LogicalExpr(expr, op, right);
     }
 
     return expr;

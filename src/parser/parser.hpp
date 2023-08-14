@@ -25,18 +25,26 @@ class Parser {
         bool isRepl = false;
         bool foundExpression = false;
         int current = 0;
+        int loopDepth = 0;
 
         Stmt* declaration();
         Stmt* statement();
+        Stmt* ifBlockStatements();
         Stmt* printStatement();
         Stmt* printLnStatement();
+        Stmt* ifStatement();
+        Stmt* repeatStatement();
+        Stmt* breakStmt();
         Stmt* expressionStatement();
         vector<Stmt*> block();
+        vector<Stmt*> ifBlock();
 
         Stmt* varDeclaration();
 
         Expr* expression();
         Expr* assignment();
+        Expr* orExpr();
+        Expr* andExpr();
         Expr* equality();
         Expr* comparison();
         Expr* term();

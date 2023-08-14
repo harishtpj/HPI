@@ -8,17 +8,33 @@ declaration    : varDecl
 varDecl        : ('let' | 'LET') IDENTIFIER ('=' expression)? ;
 
 statement      : exprStmt
+               | ifStmt
                | printStmt
+               | printLnStmt
+               | loopStmt
+               | whileStmt
+               | forStmt
                | block ;
 
-block          : '{' declaration* '}' ;
+block          : ('do' | 'DO') declaration* ('end' | 'END') ;
 
 exprStmt       : expression ;
 printStmt      : ('print' | 'PRINT') expression ;
+printLnStmt    : ('println' | 'PRINTLN') expression ;
+
+ifStmt         : ('if' | 'IF') expression ('then' | 'THEN') statement
+                 (('else' | 'ELSE') statement)? ;
+
+loopStmt        : ('repeat' | 'REPEAT') statement ;
+whileStmt       : ('while' | 'WHILE')  expression ('loop' | 'LOOP') statement;
+forStmt         : ('for' | 'FOR') (varDecl | exprStmt) ('to' | 'TO') 
+                  expression ('by' | 'BY') expression ('loop' | 'LOOP') statement ;
 
 expression     : assignment ;
 assignment     : IDENTIFIER '=' assignment
-               | equality ;
+               | logic_or ;
+logic_or       : logic_and ('or' logic_and)* ;
+logic_and      : equality ('and' equality)* ;
 equality       : comparison ( ( '!=' | '==' ) comparison )* ;
 comparison     : term ( ( '>' | '>=' | '<' | '<=' ) term )* ;
 term           : factor ( ( '-' | '+' ) factor )* ;

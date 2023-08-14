@@ -25,6 +25,8 @@ Scanner::Scanner(string src): src(src) {
     keywords["then"] = TokenType::THEN;
     keywords["let"] = TokenType::LET;
     keywords["break"] = TokenType::BREAK;
+    keywords["loop"] = TokenType::LOOP;
+    keywords["repeat"] = TokenType::REPEAT;
 
     // Support uppercase statements
     for (auto &[key, value] : keywords) {

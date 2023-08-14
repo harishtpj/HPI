@@ -73,6 +73,8 @@ void HPI::error(int line, string msg) {
 void HPI::error(Token token, string msg) {
     if (token.type == TokenType::E_O_F) {
         report(token.line, " at end", msg);
+    } else if (token.type == TokenType::NEWLINE) {
+        report(token.line, " at newline", msg);
     } else {
         report(token.line, format(" at '{}'", token.lexeme), msg);
     }

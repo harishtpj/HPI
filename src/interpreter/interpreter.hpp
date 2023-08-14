@@ -6,10 +6,16 @@
 #include <vector>
 #include "environment.hpp"
 
+class BreakException: public runtime_error {
+    public:
+        BreakException(): runtime_error("break") {}
+};
+
 class Interpreter : public ExprVisitor, StmtVisitor {
     public:
         void interpret(vector<Stmt*> expression);
         string interpret(Expr* expr);
+        any visitLogicalExpr(LogicalExpr* expr);
         any visitLiteralExpr(LiteralExpr* expr);
         any visitGroupingExpr(GroupingExpr* expr);
         any visitUnaryExpr(UnaryExpr* expr);
@@ -18,6 +24,9 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         any visitExpressionStmt(ExpressionStmt* stmt);
         any visitPrintStmt(PrintStmt* stmt);
         any visitBlockStmt(BlockStmt* stmt);
+        any visitIfStmt(IfStmt* stmt);
+        any visitRepeatStmt(RepeatStmt* stmt);
+        any visitBreakStmt(BreakStmt* stmt);
 
         any visitVarStmt(VarStmt* stmt);
         any visitVariableExpr(VariableExpr* expr);

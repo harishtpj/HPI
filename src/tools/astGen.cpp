@@ -95,7 +95,8 @@ class ASTGenerator {
                 file << fieldType + " " + fieldName;
             }
         }
-        file << ")  : ";
+        if (!fieldList.empty()) file << ")  : ";
+        else file << ") ";
         first = true;
         for (auto field : fieldList) {
             if (!first)
@@ -152,6 +153,7 @@ int main(int argc, char** argv) {
              "BinaryExpr   : Expr left, Token Operator, Expr right",
              "GroupingExpr : Expr expression", 
              "LiteralExpr  : std::any value",
+             "LogicalExpr  : Expr left, Token Operator, Expr right",
              "UnaryExpr    : Token Operator, Expr right",
              "VariableExpr : Token name",}};
         ASTGenerator exprAstGenerator(outDir, astSpec);
@@ -159,9 +161,12 @@ int main(int argc, char** argv) {
 
         const ASTGenerator::ASTSpecification astSpec2 = { "Stmt", {
             "BlockStmt      : std::vector<Stmt*> statements",
+            "BreakStmt      :",
             "ExpressionStmt : Expr* expression",
+            "IfStmt         : Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
             "PrintStmt      : Expr* expression",
-            "VarStmt        : Token name, Expr* initializer",}};
+            "VarStmt        : Token name, Expr* initializer",
+            "RepeatStmt       : Stmt* body",}};
         ASTGenerator stmtAstGenerator(outDir, astSpec2);
         stmtAstGenerator.generate();
     }

@@ -28,6 +28,18 @@ any Interpreter::visitAssignExpr(AssignExpr* expr) {
     return value;
 }
 
+any Interpreter::visitLogicalExpr(LogicalExpr* expr) {
+    any left = evaluate(expr->left);
+
+    if ((expr->Operator).type == TokenType::OR) {
+        if (isTruthy(left)) return left;
+    } else {
+        if (!isTruthy(left)) return left;
+    }
+
+    return evaluate(expr->right);
+}
+
 any Interpreter::visitLiteralExpr(LiteralExpr* expr) {
     return expr->value;
 }
@@ -119,6 +131,30 @@ any Interpreter::visitPrintStmt(PrintStmt* stmt) {
 any Interpreter::visitBlockStmt(BlockStmt* stmt) {
     executeBlock(stmt->statements, new Environment(environment));
     return nullptr;
+}
+
+any Interpreter::visitIfStmt(IfStmt* stmt) {
+    if (isTruthy(evaluate(stmt->condition))) {
+        execute(stmt->thenBranch);
+    } else if (stmt->elseBranch != nullptr) {
+        execute(stmt->elseBranch);
+    }
+    return nullptr;
+}
+
+any Interpreter::visitRepeatStmt(RepeatStmt* stmt) {
+    try {
+        while (true) {
+            execute(stmt->body);
+        }
+    } catch (const BreakException&) {
+        // PASS
+    }
+    return nullptr;
+}
+
+any Interpreter::visitBreakStmt(BreakStmt* stmt) {
+    throw BreakException();
 }
 
 any Interpreter::visitVarStmt(VarStmt* stmt) {
