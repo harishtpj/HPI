@@ -23,7 +23,7 @@ enum class TokenType {
     // Keywords.
     AND, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
     PRINT, PRINTLN, INPUT, RETURN, TRUE, WHILE, DO, END, TO, 
-    THEN, LET, BREAK, LOOP, REPEAT,
+    THEN, LET, BREAK, LOOP, BY,
 
     NEWLINE,
     E_O_F

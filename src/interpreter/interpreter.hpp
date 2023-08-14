@@ -25,7 +25,7 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         any visitPrintStmt(PrintStmt* stmt);
         any visitBlockStmt(BlockStmt* stmt);
         any visitIfStmt(IfStmt* stmt);
-        any visitRepeatStmt(RepeatStmt* stmt);
+        any visitLoopStmt(LoopStmt* stmt);
         any visitBreakStmt(BreakStmt* stmt);
 
         any visitVarStmt(VarStmt* stmt);

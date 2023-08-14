@@ -142,7 +142,7 @@ any Interpreter::visitIfStmt(IfStmt* stmt) {
     return nullptr;
 }
 
-any Interpreter::visitRepeatStmt(RepeatStmt* stmt) {
+any Interpreter::visitLoopStmt(LoopStmt* stmt) {
     try {
         while (true) {
             execute(stmt->body);

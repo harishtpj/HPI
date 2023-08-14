@@ -33,7 +33,9 @@ class Parser {
         Stmt* printStatement();
         Stmt* printLnStatement();
         Stmt* ifStatement();
-        Stmt* repeatStatement();
+        Stmt* loopStatement();
+        Stmt* whileStatement();
+        Stmt* forStatement();
         Stmt* breakStmt();
         Stmt* expressionStatement();
         vector<Stmt*> block();

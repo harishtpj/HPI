@@ -9,7 +9,7 @@ class ExpressionStmt ; // forward declare
 class IfStmt         ; // forward declare
 class PrintStmt      ; // forward declare
 class VarStmt        ; // forward declare
-class RepeatStmt       ; // forward declare
+class LoopStmt       ; // forward declare
 class StmtVisitor {
 public:
     virtual ~StmtVisitor() {}
@@ -19,7 +19,7 @@ public:
     virtual std::any visitIfStmt         (IfStmt         * Stmt) = 0;
     virtual std::any visitPrintStmt      (PrintStmt      * Stmt) = 0;
     virtual std::any visitVarStmt        (VarStmt        * Stmt) = 0;
-    virtual std::any visitRepeatStmt       (RepeatStmt       * Stmt) = 0;
+    virtual std::any visitLoopStmt       (LoopStmt       * Stmt) = 0;
 };
 class Stmt {
 public:
@@ -82,11 +82,11 @@ public:
     Token name;
     Expr* initializer;
 };
-class RepeatStmt        : public Stmt {
+class LoopStmt        : public Stmt {
 public:
-    RepeatStmt       (Stmt* body)  : body(body) {}
+    LoopStmt       (Stmt* body)  : body(body) {}
     std::any accept(StmtVisitor* visitor) override {
-        return visitor->visitRepeatStmt       (this);
+        return visitor->visitLoopStmt       (this);
     }
 public:
     Stmt* body;

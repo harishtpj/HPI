@@ -166,7 +166,7 @@ int main(int argc, char** argv) {
             "IfStmt         : Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
             "PrintStmt      : Expr* expression",
             "VarStmt        : Token name, Expr* initializer",
-            "RepeatStmt       : Stmt* body",}};
+            "LoopStmt       : Stmt* body",}};
         ASTGenerator stmtAstGenerator(outDir, astSpec2);
         stmtAstGenerator.generate();
     }

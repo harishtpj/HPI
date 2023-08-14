@@ -31,9 +31,11 @@ Stmt* Parser::statement() {
     while (check(TokenType::NEWLINE)) advance();
     if (match({TokenType::BREAK})) return breakStmt();
     if (match({TokenType::IF})) return ifStatement();
+    if (match({TokenType::WHILE})) return whileStatement();
+    //if (match({TokenType::FOR})) return forStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::PRINTLN})) return printLnStatement();
-    if (match({TokenType::REPEAT})) return repeatStatement();
+    if (match({TokenType::LOOP})) return loopStatement();
     if (match({TokenType::DO})) return new BlockStmt(block());
 
     return expressionStatement();
@@ -43,13 +45,55 @@ Stmt* Parser::ifBlockStatements() {
     while (check(TokenType::NEWLINE)) advance();
     if (match({TokenType::BREAK})) return breakStmt();
     if (match({TokenType::IF})) return ifStatement();
+    if (match({TokenType::WHILE})) return whileStatement();
+    //if (match({TokenType::FOR})) return forStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::PRINTLN})) return printLnStatement();
-    if (match({TokenType::REPEAT})) return repeatStatement();
+    if (match({TokenType::LOOP})) return loopStatement();
     if (match({TokenType::DO})) return new BlockStmt(ifBlock());
 
     return expressionStatement();
 }
+
+Stmt* Parser::whileStatement() {
+    Expr* condition = expression();
+    Stmt* body = statement();
+
+    Stmt* ifGuard = new IfStmt(condition, body, new BreakStmt());
+    return new LoopStmt(ifGuard);
+}
+
+/*Stmt* Parser::forStatement() {
+    Stmt* initializer;
+    Token var(TokenType::IDENTIFIER, "", "", 0);
+    if (match({TokenType::LET})) {
+        initializer = varDeclaration();
+        Token varVal = dynamic_cast<VarStmt*>(initializer)->name;
+        var.type = varVal.type;
+        var.lexeme = varVal.lexeme;
+        var.
+    } else {
+        isRepl = true;
+        initializer = expressionStatement();
+        isRepl = false;
+        Token var = dynamic_cast<VariableExpr*>(dynamic_cast<ExpressionStmt*>(initializer)->expression)->name;
+    }
+
+
+    consume(TokenType::TO, "Expect 'to' keyword after for initializer.");
+    Expr* destNo = expression();
+
+    vector<Token> forTokens = {
+        var,
+
+    }
+
+    Parser forParser(forTokens);
+    
+
+    consume(TokenType::BY, "Expect 'by' keyword after for condition.");
+    Expr* increment = expression();
+}*/
 
 Stmt* Parser::ifStatement() {
     Expr* condition = expression();
@@ -89,11 +133,11 @@ Stmt* Parser::printLnStatement() {
     return new BlockStmt({print, newLine});
 }
 
-Stmt* Parser::repeatStatement() {
+Stmt* Parser::loopStatement() {
     try {
         loopDepth++;
         Stmt* body = statement();
-        return new RepeatStmt(body);
+        return new LoopStmt(body);
     } catch(...) {
         loopDepth--;
         throw;
