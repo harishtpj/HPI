@@ -25,10 +25,10 @@ printLnStmt    : ('println' | 'PRINTLN') expression ;
 ifStmt         : ('if' | 'IF') expression ('then' | 'THEN') statement
                  (('else' | 'ELSE') statement)? ;
 
-loopStmt        : ('repeat' | 'REPEAT') statement ;
-whileStmt       : ('while' | 'WHILE')  expression ('loop' | 'LOOP') statement;
-forStmt         : ('for' | 'FOR') (varDecl | exprStmt) ('to' | 'TO') 
-                  expression ('by' | 'BY') expression ('loop' | 'LOOP') statement ;
+loopStmt        : ('loop' | 'LOOP') statement ;
+whileStmt       : ('while' | 'WHILE')  expression statement;
+forStmt         : ('for' | 'FOR') IDENTIFIER ('in' | 'IN') expression ('to' | 'TO') 
+                  expression ('by' | 'BY') expression statement ;
 
 expression     : assignment ;
 assignment     : IDENTIFIER '=' assignment

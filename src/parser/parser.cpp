@@ -32,7 +32,7 @@ Stmt* Parser::statement() {
     if (match({TokenType::BREAK})) return breakStmt();
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::WHILE})) return whileStatement();
-    //if (match({TokenType::FOR})) return forStatement();
+    if (match({TokenType::FOR})) return forStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::PRINTLN})) return printLnStatement();
     if (match({TokenType::LOOP})) return loopStatement();
@@ -46,7 +46,7 @@ Stmt* Parser::ifBlockStatements() {
     if (match({TokenType::BREAK})) return breakStmt();
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::WHILE})) return whileStatement();
-    //if (match({TokenType::FOR})) return forStatement();
+    if (match({TokenType::FOR})) return forStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::PRINTLN})) return printLnStatement();
     if (match({TokenType::LOOP})) return loopStatement();
@@ -56,44 +56,53 @@ Stmt* Parser::ifBlockStatements() {
 }
 
 Stmt* Parser::whileStatement() {
-    Expr* condition = expression();
-    Stmt* body = statement();
+    try {
+        loopDepth++;
+        Expr* condition = expression();
+        Stmt* body = statement();
 
-    Stmt* ifGuard = new IfStmt(condition, body, new BreakStmt());
-    return new LoopStmt(ifGuard);
+        Stmt* ifGuard = new IfStmt(condition, body, new BreakStmt());
+        return new LoopStmt(ifGuard);
+    } catch(...) {
+        loopDepth--;
+        throw;
+    }
+    loopDepth--;
 }
 
-/*Stmt* Parser::forStatement() {
-    Stmt* initializer;
-    Token var(TokenType::IDENTIFIER, "", "", 0);
-    if (match({TokenType::LET})) {
-        initializer = varDeclaration();
-        Token varVal = dynamic_cast<VarStmt*>(initializer)->name;
-        var.type = varVal.type;
-        var.lexeme = varVal.lexeme;
-        var.
-    } else {
-        isRepl = true;
-        initializer = expressionStatement();
-        isRepl = false;
-        Token var = dynamic_cast<VariableExpr*>(dynamic_cast<ExpressionStmt*>(initializer)->expression)->name;
+Stmt* Parser::forStatement() {
+    try {
+        loopDepth++;
+
+        Token counterVar = consume(TokenType::IDENTIFIER, "Expect variable name.");
+        consume(TokenType::IN, "Expect 'in' keyword after variable name[for loop construct].");
+        Expr* start = expression();
+        consume(TokenType::TO, "Expect 'to' keyword after expression in for loop.");
+        Expr* end = expression();
+        consume(TokenType::BY, "Expect 'by' keyword after 2nd expression in for loop.");
+        Expr* step = expression();
+        Stmt* body = statement();
+
+        // for (let counter = start; counter <= end; counter += step)
+        // Corresponds to let <var> = <startexpr>
+        Stmt* initCounter = new VarStmt(counterVar, start);
+        // Corresponds to counter <= <endexpr>
+        Token lessEq = Token(TokenType::LESS_EQUAL, "<=", "", counterVar.line);
+        Expr* condition = new BinaryExpr(new VariableExpr(counterVar), lessEq, end);
+        // Corresponds to counter += <stepexpr>
+        Token plusOp = Token(TokenType::PLUS, "+", "", counterVar.line);
+        Expr* incrementExpr = new BinaryExpr(new VariableExpr(counterVar), plusOp, step);
+        Stmt* increment = new ExpressionStmt(new AssignExpr(counterVar, incrementExpr));
+
+        body = new BlockStmt({body, increment});
+        Stmt* ifGuard = new IfStmt(condition, body, new BreakStmt());
+        return new BlockStmt({initCounter, new LoopStmt(ifGuard)});
+    } catch(...) {
+        loopDepth--;
+        throw;
     }
-
-
-    consume(TokenType::TO, "Expect 'to' keyword after for initializer.");
-    Expr* destNo = expression();
-
-    vector<Token> forTokens = {
-        var,
-
-    }
-
-    Parser forParser(forTokens);
-    
-
-    consume(TokenType::BY, "Expect 'by' keyword after for condition.");
-    Expr* increment = expression();
-}*/
+    loopDepth--;
+}   
 
 Stmt* Parser::ifStatement() {
     Expr* condition = expression();
