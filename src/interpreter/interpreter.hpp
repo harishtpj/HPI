@@ -5,6 +5,7 @@
 #include "runtime_err.hpp"
 #include <vector>
 #include "environment.hpp"
+#include "HPICallable.hpp"
 
 class BreakException: public runtime_error {
     public:
@@ -13,6 +14,7 @@ class BreakException: public runtime_error {
 
 class Interpreter : public ExprVisitor, StmtVisitor {
     public:
+        Interpreter();
         void interpret(vector<Stmt*> expression);
         string interpret(Expr* expr);
         any visitLogicalExpr(LogicalExpr* expr);
@@ -20,20 +22,19 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         any visitGroupingExpr(GroupingExpr* expr);
         any visitUnaryExpr(UnaryExpr* expr);
         any visitBinaryExpr(BinaryExpr* expr);
-
         any visitExpressionStmt(ExpressionStmt* stmt);
         any visitPrintStmt(PrintStmt* stmt);
         any visitBlockStmt(BlockStmt* stmt);
         any visitIfStmt(IfStmt* stmt);
         any visitLoopStmt(LoopStmt* stmt);
         any visitBreakStmt(BreakStmt* stmt);
-
         any visitVarStmt(VarStmt* stmt);
         any visitVariableExpr(VariableExpr* expr);
-
         any visitAssignExpr(AssignExpr* expr);
+        any visitCallExpr(CallExpr* expr);
     
     private:
+        Environment globals;
         Environment environment;
 
         any evaluate(Expr* expr);

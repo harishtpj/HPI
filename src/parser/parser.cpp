@@ -296,7 +296,38 @@ Expr* Parser::unary() {
         return new UnaryExpr(op, right);
     }
 
-    return primary();
+    return call();
+}
+
+Expr* Parser::call() {
+    Expr* expr = primary();
+
+    while (true) {
+        if (match({TokenType::LEFT_PAREN})) {
+            expr = finishCall(expr);
+        } else {
+            break;
+        }
+    }
+
+    return expr;
+}
+
+Expr* Parser::finishCall(Expr* callee) {
+    vector<Expr*> arguments;
+
+    if (!check(TokenType::RIGHT_PAREN)) {
+        do {
+            if (arguments.size() >= 255) {
+                error(peek(), "Cannot have more than 255 arguments.");
+            }
+            arguments.push_back(expression());
+        } while (match({TokenType::COMMA}));
+    }
+
+    Token paren = consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+
+    return new CallExpr(callee, paren, arguments);
 }
 
 Expr* Parser::primary() {

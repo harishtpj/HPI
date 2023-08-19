@@ -52,6 +52,8 @@ class Parser {
         Expr* term();
         Expr* factor();
         Expr* unary();
+        Expr* call();
+        Expr* finishCall(Expr* callee);
         Expr* primary();
 
         bool match(const vector<TokenType>& types);

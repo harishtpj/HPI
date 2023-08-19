@@ -45,8 +45,8 @@ class ASTGenerator {
 
         // Expr base abstract interface
         file << "#include \"scanner/token.hpp\"" << std::endl;
+        file << "#include <vector>" << std::endl;
         file << ((baseName == "Stmt") ? "#include \"Expr.hpp\"" : " ") << std::endl;
-        file << ((baseName == "Stmt") ? "#include <vector>" : " ") << std::endl;
 
         // forward declarations
         file << "class " << baseName << "; // forward declare" << std::endl;
@@ -151,6 +151,7 @@ int main(int argc, char** argv) {
         const ASTGenerator::ASTSpecification astSpec = {"Expr", {
              "AssignExpr   : Token name, Expr value",
              "BinaryExpr   : Expr left, Token Operator, Expr right",
+             "CallExpr     : Expr callee, Token paren, std::vector<Expr*> args",
              "GroupingExpr : Expr expression", 
              "LiteralExpr  : std::any value",
              "LogicalExpr  : Expr left, Token Operator, Expr right",

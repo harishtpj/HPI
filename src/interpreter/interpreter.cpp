@@ -1,6 +1,14 @@
 #include "interpreter.hpp"
+#include "builtin.hpp"
 #include "../hpi.hpp"
 #include <iostream>
+
+Interpreter::Interpreter() {
+    // Native Functions
+    globals.define("clock", new Clock());
+
+    environment = globals;
+}
 
 void Interpreter::interpret(vector<Stmt*> stmts) {
     try {
@@ -115,6 +123,29 @@ any Interpreter::visitBinaryExpr(BinaryExpr* expr) {
     }
 
     return nullptr;
+}
+
+any Interpreter::visitCallExpr(CallExpr* expr) {
+    auto callee = evaluate(expr->callee);
+    vector<any> arguments;
+
+    for (Expr* argument: expr->args) {
+        arguments.push_back(evaluate(argument));
+    }
+
+    HPICallable* fn;
+    if (callee.type() == typeid(Clock*)) {
+        fn = dynamic_cast<Clock*>(any_cast<Clock*>(callee));
+    } else {
+        throw RuntimeError(expr->paren, "Can only call functions.");
+    }
+
+    if (arguments.size() != fn->arity()) {
+        throw RuntimeError(expr->paren, "Expected " + to_string(fn->arity()) + 
+                            " arguments but got " + to_string(arguments.size()));
+    }
+
+    return fn->call(*this, arguments);
 }
 
 any Interpreter::visitExpressionStmt(ExpressionStmt* stmt) {

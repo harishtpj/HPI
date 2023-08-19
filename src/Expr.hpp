@@ -1,9 +1,11 @@
 #pragma once
 #include "scanner/token.hpp"
+#include <vector>
 
 class Expr; // forward declare
 class AssignExpr   ; // forward declare
 class BinaryExpr   ; // forward declare
+class CallExpr     ; // forward declare
 class GroupingExpr ; // forward declare
 class LiteralExpr  ; // forward declare
 class LogicalExpr  ; // forward declare
@@ -14,6 +16,7 @@ public:
     virtual ~ExprVisitor() {}
     virtual std::any visitAssignExpr   (AssignExpr   * Expr) = 0;
     virtual std::any visitBinaryExpr   (BinaryExpr   * Expr) = 0;
+    virtual std::any visitCallExpr     (CallExpr     * Expr) = 0;
     virtual std::any visitGroupingExpr (GroupingExpr * Expr) = 0;
     virtual std::any visitLiteralExpr  (LiteralExpr  * Expr) = 0;
     virtual std::any visitLogicalExpr  (LogicalExpr  * Expr) = 0;
@@ -45,6 +48,17 @@ public:
     Expr* left;
     Token Operator;
     Expr* right;
+};
+class CallExpr      : public Expr {
+public:
+    CallExpr     (Expr* callee, Token paren, std::vector<Expr*> args)  : callee(callee), paren(paren), args(args) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitCallExpr     (this);
+    }
+public:
+    Expr* callee;
+    Token paren;
+    std::vector<Expr*> args;
 };
 class GroupingExpr  : public Expr {
 public:
