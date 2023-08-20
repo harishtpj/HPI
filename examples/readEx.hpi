@@ -1,0 +1,9 @@
+# Simple program to illustrate usage of
+# read() native function
+
+let name = read("Enter your name: ")
+let age = read("Enter your age: ")
+
+let birthYear = 2023 - age
+
+println fmt("Hello, {}. You born on {}", name, birthYear)

@@ -6,6 +6,8 @@
 Interpreter::Interpreter() {
     // Native Functions
     globals->define("clock", new Clock());
+    globals->define("read", new Read());
+    globals->define("fmt", new Fmt());
 }
 
 void Interpreter::interpret(vector<Stmt*> stmts) {
@@ -136,6 +138,12 @@ any Interpreter::visitCallExpr(CallExpr* expr) {
         fn = dynamic_cast<HPIFunction*>(any_cast<HPIFunction*>(callee));
     } else if (callee.type() == typeid(Clock*)) {
         fn = dynamic_cast<Clock*>(any_cast<Clock*>(callee));
+    } else if (callee.type() == typeid(Read*)) {
+        fn = dynamic_cast<Read*>(any_cast<Read*>(callee));
+    } else if (callee.type() == typeid(Fmt*)) {
+        Fmt* func = any_cast<Fmt*>(callee);
+        func->paramCount = arguments.size();
+        fn = dynamic_cast<Fmt*>(func);
     } else {
         throw RuntimeError(expr->paren, "Can only call functions.");
     }
@@ -313,6 +321,14 @@ string Interpreter::stringify(any object) {
 
     if (object.type() == typeid(Clock*)) {
         return any_cast<Clock*>(object)->toString();
+    }
+
+    if (object.type() == typeid(Read*)) {
+        return any_cast<Read*>(object)->toString();
+    }
+
+    if (object.type() == typeid(Fmt*)) {
+        return any_cast<Fmt*>(object)->toString();
     }
 
     return "stringify: cannot recognize type";

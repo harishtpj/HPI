@@ -47,7 +47,7 @@ class ASTGenerator {
         file << "#include \"scanner/token.hpp\"" << std::endl;
         file << "#include <vector>" << std::endl;
         file << ((baseName == "Stmt") ? "#include \"Expr.hpp\"" : " ") << std::endl;
-        file << ((baseName == "Expr") ? "#include \"Stmt.hpp\"" : " ") << std::endl;
+        file << ((baseName == "Expr") ? "class Stmt; // forward declare" : " ") << std::endl;
 
         // forward declarations
         file << "class " << baseName << "; // forward declare" << std::endl;
