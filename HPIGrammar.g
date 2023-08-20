@@ -2,8 +2,13 @@ grammar HPIGrammar;
 
 program        : declaration* EOF ;
 
-declaration    : varDecl
+declaration    : funDecl
+               | varDecl
                | statement ;
+
+funDecl        : ('function' | 'FUNCTION') function ;
+function       : IDENTIFIER '(' parameters? ')' block ;
+parameters     : IDENTIFIER (',' IDENTIFIER)* ;
 
 varDecl        : ('let' | 'LET') IDENTIFIER ('=' expression)? ;
 
@@ -12,9 +17,14 @@ statement      : exprStmt
                | printStmt
                | printLnStmt
                | loopStmt
+               | breakStmt
+               | returnStmt
                | whileStmt
                | forStmt
                | block ;
+
+breakStmt      : ('break' | 'BREAK') ;
+returnStmt     : ('return' | 'RETURN') expression ;
 
 block          : ('do' | 'DO') declaration* ('end' | 'END') ;
 

@@ -8,6 +8,7 @@ Parser::Parser(const vector<Token>& tokens): tokens(tokens) {}
 Stmt* Parser::declaration() {
     while (check(TokenType::NEWLINE)) advance();
     try {
+        if (match({TokenType::FUNCTION})) return function();
         if (match({TokenType::LET})) return varDeclaration();
         
         return statement();
@@ -27,9 +28,31 @@ Stmt* Parser::varDeclaration() {
     return new VarStmt(name, initializer);
 }
 
+Stmt* Parser::function() {
+    Token name = consume(TokenType::IDENTIFIER, "Expect function name.");
+    consume(TokenType::LEFT_PAREN, "Expect '(' after function name.");
+
+    vector<Token> params;
+    if (!check(TokenType::RIGHT_PAREN)) {
+        do {
+            if (params.size() >= 255) {
+                error(peek(), "Can't have more than 255 parameters.");
+            }
+
+            params.push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+        } while (match({TokenType::COMMA}));
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
+
+    consume(TokenType::DO, "Expect 'do' keyword before function body.");
+    vector<Stmt*> body = block();
+    return new FunctionStmt(name, params, body);
+}
+
 Stmt* Parser::statement() {
     while (check(TokenType::NEWLINE)) advance();
     if (match({TokenType::BREAK})) return breakStmt();
+    if (match({TokenType::RETURN})) return returnStmt();
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::WHILE})) return whileStatement();
     if (match({TokenType::FOR})) return forStatement();
@@ -44,6 +67,7 @@ Stmt* Parser::statement() {
 Stmt* Parser::ifBlockStatements() {
     while (check(TokenType::NEWLINE)) advance();
     if (match({TokenType::BREAK})) return breakStmt();
+    if (match({TokenType::RETURN})) return returnStmt();
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::WHILE})) return whileStatement();
     if (match({TokenType::FOR})) return forStatement();
@@ -123,6 +147,15 @@ Stmt* Parser::breakStmt() {
     }
     consume(TokenType::NEWLINE, "Expect 'newline' after 'break'.");
     return new BreakStmt();
+}
+
+Stmt* Parser::returnStmt() {
+    Token keyword = previous();
+    Expr* value = nullptr;
+    if (!check(TokenType::NEWLINE)) value = expression();
+
+    consumeNewline();
+    return new ReturnStmt(keyword, value);
 }
 
 Stmt* Parser::printStatement() {

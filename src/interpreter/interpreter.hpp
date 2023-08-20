@@ -6,14 +6,23 @@
 #include <vector>
 #include "environment.hpp"
 #include "HPICallable.hpp"
+#include "HPIFunction.hpp"
 
 class BreakException: public runtime_error {
     public:
         BreakException(): runtime_error("break") {}
 };
 
+class ReturnException: public runtime_error {
+    public:
+        any value;
+        ReturnException(any value): runtime_error("ret"), value(value) {}
+};
+
 class Interpreter : public ExprVisitor, StmtVisitor {
     public:
+        Environment* globals = new Environment();
+        
         Interpreter();
         void interpret(vector<Stmt*> expression);
         string interpret(Expr* expr);
@@ -28,14 +37,17 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         any visitIfStmt(IfStmt* stmt);
         any visitLoopStmt(LoopStmt* stmt);
         any visitBreakStmt(BreakStmt* stmt);
+        any visitReturnStmt(ReturnStmt* stmt);
         any visitVarStmt(VarStmt* stmt);
         any visitVariableExpr(VariableExpr* expr);
         any visitAssignExpr(AssignExpr* expr);
         any visitCallExpr(CallExpr* expr);
+        any visitFunctionStmt(FunctionStmt* stmt);
+
+        void executeBlock(vector<Stmt*> stmts, Environment* env);
     
     private:
-        Environment globals;
-        Environment environment;
+        Environment* environment = globals;
 
         any evaluate(Expr* expr);
         any execute(Stmt* stmt);
@@ -44,5 +56,4 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         void checkNumberOperand(Token op, any operand);
         void checkNumberOperands(Token op, any left, any right);
         string stringify(any value);
-        void executeBlock(vector<Stmt*> stmts, Environment env);
 };

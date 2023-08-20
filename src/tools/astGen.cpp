@@ -164,8 +164,10 @@ int main(int argc, char** argv) {
             "BlockStmt      : std::vector<Stmt*> statements",
             "BreakStmt      :",
             "ExpressionStmt : Expr* expression",
+            "FunctionStmt   : Token name, std::vector<Token> params, std::vector<Stmt*> body",
             "IfStmt         : Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
             "PrintStmt      : Expr* expression",
+            "ReturnStmt     : Token keyword, Expr* value",
             "VarStmt        : Token name, Expr* initializer",
             "LoopStmt       : Stmt* body",}};
         ASTGenerator stmtAstGenerator(outDir, astSpec2);

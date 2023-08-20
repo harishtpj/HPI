@@ -16,7 +16,6 @@ class Environment {
         void define(string name, any value);
         any get(Token name);
         void assign(Token name, any value);
-        void importMod(map<string, any> mod);
 
     private:
         map<string, any> values;

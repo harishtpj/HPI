@@ -1,0 +1,10 @@
+# A program to find fibnocci series using recursion
+
+function fib(n) do
+  if n <= 1 then return n
+  return fib(n - 2) + fib(n - 1)
+end
+
+for i in 0 to 20 by 1 do
+  println fib(i)
+end

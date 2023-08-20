@@ -42,6 +42,8 @@ class Parser {
         vector<Stmt*> ifBlock();
 
         Stmt* varDeclaration();
+        Stmt* function();
+        Stmt* returnStmt();
 
         Expr* expression();
         Expr* assignment();

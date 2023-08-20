@@ -15,7 +15,7 @@ any Environment::get(Token name) {
 
     if (enclosing != nullptr) return enclosing->get(name);
 
-    throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    throw RuntimeError(name, "Undefined identifier '" + name.lexeme + "'.");
 }
 
 void Environment::assign(Token name, any value) {
@@ -30,10 +30,4 @@ void Environment::assign(Token name, any value) {
     }
 
     throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
-}
-
-void Environment::importMod(map<string, any> mod) {
-    for (auto [name, value]: mod) {
-        values[name] = value;
-    }
 }

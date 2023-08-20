@@ -5,9 +5,7 @@
 
 Interpreter::Interpreter() {
     // Native Functions
-    globals.define("clock", new Clock());
-
-    environment = globals;
+    globals->define("clock", new Clock());
 }
 
 void Interpreter::interpret(vector<Stmt*> stmts) {
@@ -32,7 +30,7 @@ string Interpreter::interpret(Expr* expr) {
 
 any Interpreter::visitAssignExpr(AssignExpr* expr) {
     any value = evaluate(expr->value);
-    environment.assign(expr->name, value);
+    environment->assign(expr->name, value);
     return value;
 }
 
@@ -134,7 +132,9 @@ any Interpreter::visitCallExpr(CallExpr* expr) {
     }
 
     HPICallable* fn;
-    if (callee.type() == typeid(Clock*)) {
+    if (callee.type() == typeid(HPIFunction*)) {
+        fn = dynamic_cast<HPIFunction*>(any_cast<HPIFunction*>(callee));
+    } else if (callee.type() == typeid(Clock*)) {
         fn = dynamic_cast<Clock*>(any_cast<Clock*>(callee));
     } else {
         throw RuntimeError(expr->paren, "Can only call functions.");
@@ -188,6 +188,20 @@ any Interpreter::visitBreakStmt(BreakStmt* stmt) {
     throw BreakException();
 }
 
+any Interpreter::visitReturnStmt(ReturnStmt* stmt) {
+    any value = nullptr;
+    if (stmt->value != nullptr) {
+        value = evaluate(stmt->value);
+    }
+    throw ReturnException(value);
+}
+
+any Interpreter::visitFunctionStmt(FunctionStmt* stmt) {
+    HPIFunction* fn = new HPIFunction(stmt, environment);
+    environment->define(stmt->name.lexeme, fn);
+    return nullptr;
+}
+
 any Interpreter::visitVarStmt(VarStmt* stmt) {
     any value = nullptr;
 
@@ -195,12 +209,12 @@ any Interpreter::visitVarStmt(VarStmt* stmt) {
         value = evaluate(stmt->initializer);
     }
         
-    environment.define(stmt->name.lexeme, value);
+    environment->define(stmt->name.lexeme, value);
     return nullptr;
 }
 
 any Interpreter::visitVariableExpr(VariableExpr* expr) {
-    return environment.get(expr->name);
+    return environment->get(expr->name);
 }
 
 any Interpreter::evaluate(Expr* expr) {
@@ -212,8 +226,8 @@ any Interpreter::execute(Stmt* stmt) {
     return nullptr;
 }
 
-void Interpreter::executeBlock(vector<Stmt*> stmts, Environment env) {
-    Environment previous = env;
+void Interpreter::executeBlock(vector<Stmt*> stmts, Environment* env) {
+    Environment* previous = this->environment;
     try {
         this->environment = env;
 
