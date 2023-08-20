@@ -1,7 +1,8 @@
 #include "HPIFunction.hpp"
 #include <iostream>
 
-HPIFunction::HPIFunction(FunctionStmt* declaration, Environment* closure): 
+HPIFunction::HPIFunction(string name, FunctionExpr* declaration, Environment* closure):
+    name(name),
     declaration(declaration),
     closure(closure) {}
 
@@ -25,5 +26,7 @@ any HPIFunction::call(Interpreter& interpreter, vector<any> arguments) {
 }
 
 string HPIFunction::toString() {
-    return format("<UserDef Fn {}>", declaration->name.lexeme);
+    return (name != "")
+            ? format("<UserDef Fn {}>", name)
+            : format("<LambdaFn>");
 }

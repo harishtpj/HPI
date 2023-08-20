@@ -2,8 +2,10 @@
 #include "scanner/token.hpp"
 #include <vector>
 
+class Stmt; // forward declare
 class Expr; // forward declare
 class AssignExpr   ; // forward declare
+class FunctionExpr ; // forward declare
 class BinaryExpr   ; // forward declare
 class CallExpr     ; // forward declare
 class GroupingExpr ; // forward declare
@@ -15,6 +17,7 @@ class ExprVisitor {
 public:
     virtual ~ExprVisitor() {}
     virtual std::any visitAssignExpr   (AssignExpr   * Expr) = 0;
+    virtual std::any visitFunctionExpr (FunctionExpr * Expr) = 0;
     virtual std::any visitBinaryExpr   (BinaryExpr   * Expr) = 0;
     virtual std::any visitCallExpr     (CallExpr     * Expr) = 0;
     virtual std::any visitGroupingExpr (GroupingExpr * Expr) = 0;
@@ -37,6 +40,16 @@ public:
 public:
     Token name;
     Expr* value;
+};
+class FunctionExpr  : public Expr {
+public:
+    FunctionExpr (std::vector<Token> params, std::vector<Stmt*> body)  : params(params), body(body) {}
+    std::any accept(ExprVisitor* visitor) override {
+        return visitor->visitFunctionExpr (this);
+    }
+public:
+    std::vector<Token> params;
+    std::vector<Stmt*> body;
 };
 class BinaryExpr    : public Expr {
 public:

@@ -4,12 +4,13 @@
 
 class HPIFunction: public HPICallable {
     public:
-        HPIFunction(FunctionStmt* declaration, Environment* closure);
+        HPIFunction(string name, FunctionExpr* declaration, Environment* closure);
         int arity();
         any call(Interpreter& interpreter, vector<any> arguments);
         string toString();
 
     private:
-        FunctionStmt* declaration;
+        string name;
+        FunctionExpr* declaration;
         Environment* closure;
 };

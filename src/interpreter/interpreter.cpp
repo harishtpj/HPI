@@ -197,7 +197,8 @@ any Interpreter::visitReturnStmt(ReturnStmt* stmt) {
 }
 
 any Interpreter::visitFunctionStmt(FunctionStmt* stmt) {
-    HPIFunction* fn = new HPIFunction(stmt, environment);
+    string fnName = stmt->name.lexeme;
+    HPIFunction* fn = new HPIFunction(fnName, stmt->fn, environment);
     environment->define(stmt->name.lexeme, fn);
     return nullptr;
 }
@@ -215,6 +216,10 @@ any Interpreter::visitVarStmt(VarStmt* stmt) {
 
 any Interpreter::visitVariableExpr(VariableExpr* expr) {
     return environment->get(expr->name);
+}
+
+any Interpreter::visitFunctionExpr(FunctionExpr* expr) {
+    return new HPIFunction("", expr, environment);
 }
 
 any Interpreter::evaluate(Expr* expr) {
@@ -301,5 +306,14 @@ string Interpreter::stringify(any object) {
     if (object.type() == typeid(bool)) {
         return any_cast<bool>(object) ? "true" : "false";
     }
+
+    if (object.type() == typeid(HPIFunction*)) {
+        return any_cast<HPIFunction*>(object)->toString();
+    }
+
+    if (object.type() == typeid(Clock*)) {
+        return any_cast<Clock*>(object)->toString();
+    }
+
     return "stringify: cannot recognize type";
 }

@@ -28,6 +28,7 @@ Scanner::Scanner(string src): src(src) {
     keywords["loop"] = TokenType::LOOP;
     keywords["by"] = TokenType::BY;
     keywords["in"] = TokenType::IN;
+    keywords["fun"] = TokenType::FUN;
 
     // Support uppercase statements
     for (auto &[key, value] : keywords) {

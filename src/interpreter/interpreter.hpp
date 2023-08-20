@@ -41,6 +41,7 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         any visitVarStmt(VarStmt* stmt);
         any visitVariableExpr(VariableExpr* expr);
         any visitAssignExpr(AssignExpr* expr);
+        any visitFunctionExpr(FunctionExpr* expr);
         any visitCallExpr(CallExpr* expr);
         any visitFunctionStmt(FunctionStmt* stmt);
 

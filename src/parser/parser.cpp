@@ -30,6 +30,10 @@ Stmt* Parser::varDeclaration() {
 
 Stmt* Parser::function() {
     Token name = consume(TokenType::IDENTIFIER, "Expect function name.");
+    return new FunctionStmt(name, functionBody());
+}
+
+FunctionExpr* Parser::functionBody() {
     consume(TokenType::LEFT_PAREN, "Expect '(' after function name.");
 
     vector<Token> params;
@@ -46,7 +50,8 @@ Stmt* Parser::function() {
 
     consume(TokenType::DO, "Expect 'do' keyword before function body.");
     vector<Stmt*> body = block();
-    return new FunctionStmt(name, params, body);
+
+    return new FunctionExpr(params, body);
 }
 
 Stmt* Parser::statement() {
@@ -364,6 +369,7 @@ Expr* Parser::finishCall(Expr* callee) {
 }
 
 Expr* Parser::primary() {
+    if (match({TokenType::FUN})) return functionBody();
     if (match({TokenType::FALSE})) return new LiteralExpr(false);
     if (match({TokenType::TRUE})) return new LiteralExpr(true);
     if (match({TokenType::NIL})) return new LiteralExpr(nullptr);

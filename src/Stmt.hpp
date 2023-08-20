@@ -2,6 +2,7 @@
 #include "scanner/token.hpp"
 #include <vector>
 #include "Expr.hpp"
+
 class Stmt; // forward declare
 class BlockStmt      ; // forward declare
 class BreakStmt      ; // forward declare
@@ -58,14 +59,13 @@ public:
 };
 class FunctionStmt    : public Stmt {
 public:
-    FunctionStmt   (Token name, std::vector<Token> params, std::vector<Stmt*> body)  : name(name), params(params), body(body) {}
+    FunctionStmt   (Token name, FunctionExpr* fn)  : name(name), fn(fn) {}
     std::any accept(StmtVisitor* visitor) override {
         return visitor->visitFunctionStmt   (this);
     }
 public:
     Token name;
-    std::vector<Token> params;
-    std::vector<Stmt*> body;
+    FunctionExpr* fn;
 };
 class IfStmt          : public Stmt {
 public:

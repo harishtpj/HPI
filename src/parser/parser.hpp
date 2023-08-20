@@ -43,6 +43,7 @@ class Parser {
 
         Stmt* varDeclaration();
         Stmt* function();
+        FunctionExpr* functionBody();
         Stmt* returnStmt();
 
         Expr* expression();

@@ -47,6 +47,7 @@ class ASTGenerator {
         file << "#include \"scanner/token.hpp\"" << std::endl;
         file << "#include <vector>" << std::endl;
         file << ((baseName == "Stmt") ? "#include \"Expr.hpp\"" : " ") << std::endl;
+        file << ((baseName == "Expr") ? "#include \"Stmt.hpp\"" : " ") << std::endl;
 
         // forward declarations
         file << "class " << baseName << "; // forward declare" << std::endl;
@@ -150,6 +151,7 @@ int main(int argc, char** argv) {
         const std::string outDir                     = argv[1];
         const ASTGenerator::ASTSpecification astSpec = {"Expr", {
              "AssignExpr   : Token name, Expr value",
+             "FunctionExpr : std::vector<Token> params, std::vector<Stmt*> body",
              "BinaryExpr   : Expr left, Token Operator, Expr right",
              "CallExpr     : Expr callee, Token paren, std::vector<Expr*> args",
              "GroupingExpr : Expr expression", 
@@ -164,7 +166,7 @@ int main(int argc, char** argv) {
             "BlockStmt      : std::vector<Stmt*> statements",
             "BreakStmt      :",
             "ExpressionStmt : Expr* expression",
-            "FunctionStmt   : Token name, std::vector<Token> params, std::vector<Stmt*> body",
+            "FunctionStmt   : Token name, FunctionExpr* fn",
             "IfStmt         : Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
             "PrintStmt      : Expr* expression",
             "ReturnStmt     : Token keyword, Expr* value",
