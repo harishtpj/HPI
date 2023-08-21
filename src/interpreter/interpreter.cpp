@@ -32,7 +32,15 @@ string Interpreter::interpret(Expr* expr) {
 
 any Interpreter::visitAssignExpr(AssignExpr* expr) {
     any value = evaluate(expr->value);
-    environment->assign(expr->name, value);
+
+    auto elem = locals.find(expr);
+    if (elem != locals.end()) {
+        int distance = elem->second;
+        environment->assignAt(distance, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
+
     return value;
 }
 
@@ -223,7 +231,17 @@ any Interpreter::visitVarStmt(VarStmt* stmt) {
 }
 
 any Interpreter::visitVariableExpr(VariableExpr* expr) {
-    return environment->get(expr->name);
+    return lookUpVariable(expr->name, expr);
+}
+
+any Interpreter::lookUpVariable(Token name, Expr* expr) {
+    auto elem = locals.find(expr);
+    if (elem != locals.end()) {
+        int distance = elem->second;
+        return environment->getAt(distance, name.lexeme);
+    } else {
+        return globals->get(name);
+    }
 }
 
 any Interpreter::visitFunctionExpr(FunctionExpr* expr) {
@@ -332,4 +350,8 @@ string Interpreter::stringify(any object) {
     }
 
     return "stringify: cannot recognize type";
+}
+
+void Interpreter::resolve(Expr* expr, int depth) {
+    locals[expr] = depth;
 }

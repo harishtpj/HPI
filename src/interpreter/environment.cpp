@@ -8,6 +8,14 @@ void Environment::define(string name, any value) {
     values[name] = value;
 }
 
+Environment* Environment::ancestor(int distance) {
+    Environment* environment = this;
+    for (int i = 0; i < distance; i++) {
+        environment = environment->enclosing;
+    }
+    return environment;
+}
+
 any Environment::get(Token name) {
     if (values.find(name.lexeme) != values.end()) {
         return values[name.lexeme];
@@ -16,6 +24,10 @@ any Environment::get(Token name) {
     if (enclosing != nullptr) return enclosing->get(name);
 
     throw RuntimeError(name, "Undefined identifier '" + name.lexeme + "'.");
+}
+
+any Environment::getAt(int distance, string name) {
+    return ancestor(distance)->values[name];
 }
 
 void Environment::assign(Token name, any value) {
@@ -30,4 +42,8 @@ void Environment::assign(Token name, any value) {
     }
 
     throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+}
+
+void Environment::assignAt(int distance, Token name, any value) {
+    ancestor(distance)->values[name.lexeme] = value;
 }

@@ -47,9 +47,11 @@ class Interpreter : public ExprVisitor, StmtVisitor {
 
         void executeBlock(vector<Stmt*> stmts, Environment* env);
         string stringify(any value);
+        void resolve(Expr* expr, int depth);
     
     private:
         Environment* environment = globals;
+        map<Expr*, int> locals;
 
         any evaluate(Expr* expr);
         any execute(Stmt* stmt);
@@ -57,4 +59,5 @@ class Interpreter : public ExprVisitor, StmtVisitor {
         bool isEqual(any left, any right);
         void checkNumberOperand(Token op, any operand);
         void checkNumberOperands(Token op, any left, any right);
+        any lookUpVariable(Token name, Expr* expr);
 };

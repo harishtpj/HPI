@@ -4,7 +4,7 @@ SRC_DIR = src
 BIN_DIR = bin
 
 SRCS = $(SRC_DIR)\*.cpp $(SRC_DIR)\scanner\*.cpp $(SRC_DIR)\parser\*.cpp  \
-		$(SRC_DIR)\interpreter\*.cpp
+		$(SRC_DIR)\interpreter\*.cpp $(SRC_DIR)\resolve\*.cpp
 EXE = $(BIN_DIR)\hpi.exe
 
 all: refresh $(EXE)

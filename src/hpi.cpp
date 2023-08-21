@@ -8,6 +8,7 @@
 #include "scanner/scanner.hpp"
 #include "parser/parser.hpp"
 #include "interpreter/interpreter.hpp"
+#include "resolve/resolver.hpp"
 
 // Global variables
 bool hadError = false;
@@ -60,6 +61,11 @@ void HPI::run(string src) {
 
     Parser parser(tokens);
     vector<Stmt*> statements = parser.parse();
+
+    if (hadError) return;
+
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
 
     if (hadError) return;
 
