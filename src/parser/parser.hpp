@@ -42,6 +42,7 @@ class Parser {
         vector<Stmt*> ifBlock();
 
         Stmt* varDeclaration();
+        Stmt* inputDeclaration();
         Stmt* function();
         FunctionExpr* functionBody();
         Stmt* returnStmt();
@@ -52,6 +53,7 @@ class Parser {
         Expr* andExpr();
         Expr* equality();
         Expr* comparison();
+        Expr* exponent();
         Expr* term();
         Expr* factor();
         Expr* unary();

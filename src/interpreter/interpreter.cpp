@@ -2,12 +2,14 @@
 #include "builtin.hpp"
 #include "../hpi.hpp"
 #include <iostream>
+#include <cmath>
 
 Interpreter::Interpreter() {
     // Native Functions
     globals->define("clock", new Clock());
     globals->define("read", new Read());
     globals->define("fmt", new Fmt());
+    globals->define("exit", new Exit());
 }
 
 void Interpreter::interpret(vector<Stmt*> stmts) {
@@ -124,10 +126,18 @@ any Interpreter::visitBinaryExpr(BinaryExpr* expr) {
         case TokenType::SLASH:
             checkNumberOperands(expr->Operator, left, right);
             return any_cast<double>(left) / any_cast<double>(right);
+        
+        case TokenType::PERCENT:
+            checkNumberOperands(expr->Operator, left, right);
+            return fmod(any_cast<double>(left), any_cast<double>(right));
 
         case TokenType::STAR:
             checkNumberOperands(expr->Operator, left, right);
             return any_cast<double>(left) * any_cast<double>(right);
+        
+        case TokenType::STAR_STAR:
+            checkNumberOperands(expr->Operator, left, right);
+            return pow(any_cast<double>(left), any_cast<double>(right));
     }
 
     return nullptr;
@@ -142,18 +152,26 @@ any Interpreter::visitCallExpr(CallExpr* expr) {
     }
 
     HPICallable* fn;
-    if (callee.type() == typeid(HPIFunction*)) {
-        fn = dynamic_cast<HPIFunction*>(any_cast<HPIFunction*>(callee));
-    } else if (callee.type() == typeid(Clock*)) {
-        fn = dynamic_cast<Clock*>(any_cast<Clock*>(callee));
-    } else if (callee.type() == typeid(Read*)) {
-        fn = dynamic_cast<Read*>(any_cast<Read*>(callee));
-    } else if (callee.type() == typeid(Fmt*)) {
-        Fmt* func = any_cast<Fmt*>(callee);
-        func->paramCount = arguments.size();
-        fn = dynamic_cast<Fmt*>(func);
-    } else {
-        throw RuntimeError(expr->paren, "Can only call functions.");
+    try {
+        if (callee.type() == typeid(HPIFunction*)) {
+            fn = dynamic_cast<HPIFunction*>(any_cast<HPIFunction*>(callee));
+        } else if (callee.type() == typeid(Clock*)) {
+            fn = dynamic_cast<Clock*>(any_cast<Clock*>(callee));
+        } else if (callee.type() == typeid(Read*)) {
+            fn = dynamic_cast<Read*>(any_cast<Read*>(callee));
+        } else if (callee.type() == typeid(Exit*)) {
+            Exit* func = any_cast<Exit*>(callee);
+            func->paramCount = arguments.size() > 0 ? 1 : 0;
+            fn = dynamic_cast<Exit*>(func);
+        } else if (callee.type() == typeid(Fmt*)) {
+            Fmt* func = any_cast<Fmt*>(callee);
+            func->paramCount = arguments.size();
+            fn = dynamic_cast<Fmt*>(func);
+        } else {
+            throw RuntimeError(expr->paren, "Can only call functions.");
+        }
+    } catch (exception& e) {
+        throw RuntimeError(expr->paren, format("Internal C++ Error:\n{}", e.what()));
     }
 
     if (arguments.size() != fn->arity()) {
@@ -343,6 +361,10 @@ string Interpreter::stringify(any object) {
 
     if (object.type() == typeid(Read*)) {
         return any_cast<Read*>(object)->toString();
+    }
+
+    if (object.type() == typeid(Exit*)) {
+        return any_cast<Exit*>(object)->toString();
     }
 
     if (object.type() == typeid(Fmt*)) {

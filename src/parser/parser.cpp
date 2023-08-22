@@ -10,6 +10,7 @@ Stmt* Parser::declaration() {
     try {
         if (match({TokenType::FUNCTION})) return function();
         if (match({TokenType::LET})) return varDeclaration();
+        if (match({TokenType::INPUT})) return inputDeclaration();
         
         return statement();
     } catch (const ParseError& e) {
@@ -26,6 +27,18 @@ Stmt* Parser::varDeclaration() {
 
     if (!isRepl) consumeNewline();
     return new VarStmt(name, initializer);
+}
+
+Stmt* Parser::inputDeclaration() {
+    Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+
+    // Make call to read("");
+    Expr* callee = new VariableExpr(Token(TokenType::IDENTIFIER, "read", "", name.line));
+    vector<Expr*> arguments{new LiteralExpr(string{""})};
+    Expr* initiallizer = new CallExpr(callee, previous(), arguments);
+    if (!isRepl) consumeNewline();
+
+    return new VarStmt(name, initiallizer);
 }
 
 Stmt* Parser::function() {
@@ -291,10 +304,22 @@ Expr* Parser::equality() {
 }
 
 Expr* Parser::comparison() {
-    Expr* expr = term();
+    Expr* expr = exponent();
 
     while (match({TokenType::GREATER, TokenType::GREATER_EQUAL, 
                         TokenType::LESS, TokenType::LESS_EQUAL})) {
+        Token op = previous();
+        Expr* right = exponent();
+        expr = new BinaryExpr(expr, op, right);
+    }
+
+    return expr;
+}
+
+Expr* Parser::exponent() {
+    Expr* expr = term();
+
+    while (match({TokenType::STAR_STAR})) {
         Token op = previous();
         Expr* right = term();
         expr = new BinaryExpr(expr, op, right);
@@ -318,7 +343,7 @@ Expr* Parser::term() {
 Expr* Parser::factor() {
     Expr* expr = unary();
 
-    while (match({TokenType::SLASH, TokenType::STAR})) {
+    while (match({TokenType::SLASH, TokenType::STAR, TokenType::PERCENT})) {
         Token op = previous();
         Expr* right = unary();
         expr = new BinaryExpr(expr, op, right);

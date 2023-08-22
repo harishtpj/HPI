@@ -32,7 +32,7 @@ void HPI::runPrompt() {
     while (true) {
         cout << ".>> ";
         getline(cin, line);
-        if (line.empty()) break;
+        if (line.empty()) continue;
 
         Scanner scanner(line);
         vector<Token> tokens = scanner.scanTokens();

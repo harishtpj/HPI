@@ -47,6 +47,25 @@ class Read: public HPICallable {
         }
 };
 
+class Exit: public HPICallable {
+    public:
+        short unsigned int paramCount;
+        int arity() override {
+            return paramCount;
+        }
+
+        any call(Interpreter& interpreter, vector<any> args) override {
+            if (args.size() > 0)
+                exit((int)any_cast<double>(args[0]));
+            else
+                exit(0);
+        }
+
+        string toString() override {
+            return "<NativeFn exit>";
+        }
+};
+
 template <typename... Args>
 std::string format_helper(const std::string& format_string, const std::vector<std::string>& values, Args... args) {
     if (values.empty()) {

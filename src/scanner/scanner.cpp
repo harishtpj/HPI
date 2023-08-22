@@ -58,10 +58,13 @@ void Scanner::scanToken() {
         case '.': addToken(TokenType::DOT); break;
         case '-': addToken(TokenType::MINUS); break;
         case '+': addToken(TokenType::PLUS); break;
-        case '*': addToken(TokenType::STAR); break;
         case '/': addToken(TokenType::SLASH); break;
+        case '%': addToken(TokenType::PERCENT); break;
         case '[': addToken(TokenType::LEFT_BRACKET); break;
         case ']': addToken(TokenType::RIGHT_BRACKET); break;
+        case '*':
+            addToken(match('*') ? TokenType::STAR_STAR : TokenType::STAR);
+            break;
         case '!': 
             addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG); 
             break;

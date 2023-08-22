@@ -4,6 +4,7 @@ program        : declaration* EOF ;
 
 declaration    : funDecl
                | varDecl
+               | inputDecl
                | statement ;
 
 funDecl        : ('function' | 'FUNCTION') function ;
@@ -11,6 +12,7 @@ function       : IDENTIFIER '(' parameters? ')' block ;
 parameters     : IDENTIFIER (',' IDENTIFIER)* ;
 
 varDecl        : ('let' | 'LET') IDENTIFIER ('=' expression)? ;
+inputDecl      : ('input' | 'INPUT') IDENTIFIER ;
 
 statement      : exprStmt
                | ifStmt
@@ -46,9 +48,10 @@ assignment     : IDENTIFIER '=' assignment
 logic_or       : logic_and ('or' logic_and)* ;
 logic_and      : equality ('and' equality)* ;
 equality       : comparison ( ( '!=' | '==' ) comparison )* ;
-comparison     : term ( ( '>' | '>=' | '<' | '<=' ) term )* ;
+comparison     : exponent ( ( '>' | '>=' | '<' | '<=' ) exponent )* ;
+exponent       : term ( '**' term )* ;
 term           : factor ( ( '-' | '+' ) factor )* ;
-factor         : unary ( ( '/' | '*' ) unary )* ;
+factor         : unary ( ( '/' | '*' | '%' ) unary )* ;
 unary          : ( '!' | '-' ) unary | call ;
 call           : primary ( '(' arguments? ')' )* ;
 arguments      : expression ( ',' expression )* ;
