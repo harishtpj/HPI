@@ -1,0 +1,6 @@
+# Psuedocode to add two numbers
+
+INPUT a
+INPUT b
+LET sum = a + b
+PRINTLN sum

@@ -1,0 +1,14 @@
+# Psuedocode to calculate the factorial of a number
+# Using recursion
+
+FUNCTION factorial(n) DO
+    IF n <= 0 THEN
+        RETURN 1
+    ELSE
+        RETURN n * factorial(n - 1)
+END
+
+PRINT "Enter a no: "
+INPUT n
+LET ans = factorial(n)
+PRINTLN fmt("{}! = {}", n, ans)

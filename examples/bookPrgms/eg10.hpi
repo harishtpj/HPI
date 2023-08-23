@@ -1,0 +1,13 @@
+# Psuedocode to count words entered by user
+# Until he/she enters 'x'
+
+LET count = 0
+WHILE true DO
+    PRINT "Enter a word: "
+    INPUT word
+    IF word == "x" THEN DO
+        PRINTLN fmt("Words Entered: {}", count)
+        BREAK
+    ELSE
+        count = count + 1
+END

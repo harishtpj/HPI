@@ -1,0 +1,8 @@
+# Psuedocode to find area and perimeter of rectangle
+
+INPUT length
+INPUT breadth
+LET area = length * breadth
+LET perimeter = 2 * (length + breadth)
+PRINTLN area
+PRINTLN perimeter

@@ -1,0 +1,17 @@
+# Psuedocode to Convert Celsius <-> Fahrenheit
+
+PRINTLN "Press 1 to convert from Fahrenheit to celsius"
+PRINTLN "Press 2 to convert form Celsius to Fahrenheit"
+INPUT opt
+
+PRINT "Enter value: "
+INPUT value
+
+IF opt == 1 THEN DO
+    LET c = 5/9 * (value - 32)
+    PRINTLN c
+ELSE IF opt == 2 THEN DO
+    LET f = (9/5 * value) + 32
+    PRINTLN f
+ELSE
+    PRINTLN "Please enter either 1 or 2"

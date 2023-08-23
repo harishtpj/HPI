@@ -1,0 +1,8 @@
+# Psuedocode to print from 1 to 10
+
+LET low = 1
+LET high = 10
+
+FOR count IN low TO high BY 1 DO
+    PRINTLN count
+END
