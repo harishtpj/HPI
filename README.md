@@ -30,6 +30,8 @@ major platforms has been provided in [releases](https://github.com/harishtpj/HPI
 If you're going to use the precompiled binaries, make sure that you've added their location to your **PATH** 
 environment variable for system-wide access.
 
+A web editor is also available for this at https://harishtpj.github.io/HPI/.
+
 # Usage
 To run your first program, fire up you favourite text editor and copy the following lines to `hello.hpi` file:
 
@@ -69,7 +71,7 @@ This project is currently maintained by **M.V.Harish Kumar**.
 
 # Roadmap
 - [x] Create a basic, functional interpreter
-- [ ] Make a web editor for HPI
+- [x] Make a web editor for HPI
 - [ ] Refine syntax and logic
 
 # Project status
