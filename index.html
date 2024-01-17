@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HPI WEB TESTING</title>
+</head>
+<body>
+    <main>
+        <h1>HPI WEB TESTING</h1>
+        <h3>A simple web interface to HPI language. Click 'Submit' to run. Check the console for output</h3>
+    </main>
+    <script>
+        var hpi_run; // Declare the hpi_run variable outside the onRuntimeInitialized function
+
+        var Module = {
+            onRuntimeInitialized: () => {
+                hpi_run = Module.cwrap("runHPI", null, ["string"]);
+            }
+        };
+
+        function handleClick() {
+            var input = document.getElementById("myInput").value;
+            hpi_run(input);
+        }
+    </script>
+    <script src="hpi.js"></script>
+    <textarea id="myInput" rows="4" cols="50" placeholder="Enter something"></textarea>
+    <button onclick="handleClick()">Submit</button>
+</body>
+</html>

@@ -67,7 +67,7 @@ class Exit: public HPICallable {
 };
 
 template <typename... Args>
-std::string format_helper(const std::string& format_string, const std::vector<std::string>& values, Args... args) {
+std::string format_helper(const std::string& format_string, std::vector<std::string>& values, Args... args) {
     if (values.empty()) {
         return std::format(format_string, args...);
     } else {

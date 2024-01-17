@@ -1,7 +1,7 @@
 # Examples in Book
 
 The following are examples from the book,
-    "Computer Science with Python, Textbook for Class XI"
+    "Computer Science with Python, Textbook for Class XI -- Sumita Arora"
 
 1. [Example 2](https://github.com/harishtpj/HPI/blob/master/examples/bookPrgms/eg2.hpi): Psuedocode to add two numbers
 2. [Example 3](https://github.com/harishtpj/HPI/blob/master/examples/bookPrgms/eg3.hpi): Psuedocode to find area and perimeter of rectangle

@@ -16,3 +16,7 @@ namespace HPI {
     void runtimeError(RuntimeError e);
     void report(int line, string where, string msg);
 }
+
+extern "C" {
+    void runHPI(char* src);
+}

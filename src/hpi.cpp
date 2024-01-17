@@ -107,3 +107,9 @@ int main(int argc, char* argv[]) {
     }
     return 0;
 }
+
+extern "C" {
+    void runHPI(char* src) {
+        HPI::run(src);
+    }
+}
